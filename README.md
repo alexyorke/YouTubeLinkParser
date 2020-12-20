@@ -1,6 +1,10 @@
 # YouTubeLinkParser
 Parses virtually any YouTube link that, when clicked, goes to a video, channel, or user. Even the messy ones.
 
+## How to use
+
+Just run `YoutubeUri.TryCreate("<YouTube URL>", out var youtubeUri)`, then `youtubeUri` will be `null` if it couldn't be found or it will contain the relavent info if it could be found. Also, the method will return `true`/`false` depending on if it could be found, just like the other `TryCreate` methods.
+
 ## FAQ
 
 Q: There's already a bunch of YouTube link parsers, why is this one any different?
