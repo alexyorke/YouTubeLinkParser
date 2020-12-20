@@ -163,7 +163,7 @@ namespace YouTubeLinkParser.Tests
         [InlineData(
             "http://m.youtube.com/channel/UCFH0dDaATlEtN6_raS95CRA?desktop_uri=%2Fchannel%2FUCFH0dDaATlEtN6_raS95",
             "UCFH0dDaATlEtN6_raS95CRA", "", "")]
-        [InlineData("https://www.youtube.com/%C3%89tienne-senpai", "Étienne-senpai", "", "")]
+        [InlineData("https://www.youtube.com/\u00c9tienne-senpai", "\u00c9tienne-senpai", "", "")]
         [InlineData(
             "https://www.youtube.com/attribution_link?a=tolCzpA7CrY&u=%2Fwatch%3Fv%3DMoBL33GT9S8%26feature%3Dshare", "",
             "", "MoBL33GT9S8")]
@@ -184,7 +184,7 @@ namespace YouTubeLinkParser.Tests
         [InlineData("http://www.youtube.com/watch/iwGFalTRHDA", "", "", "iwGFalTRHDA")]
         [InlineData("http://www.youtube.com/v/iwGFalTRHDA", "", "", "iwGFalTRHDA")]
         [InlineData("http://www.youtube.com/v/i_GFalTRHDA", "", "", "i_GFalTRHDA")]
-        [InlineData("http://www.youtube.com/c/Étienne-senpai", "Étienne-senpai", "", "")]
+        [InlineData("http://www.youtube.com/c/Ã‰tienne-senpai", "Ã‰tienne-senpai", "", "")]
         [InlineData("http://www.youtube.com/watch?v=i-GFalTRHDA&feature=related ", "", "", "i-GFalTRHDA")]
         [InlineData(
             "http://www.youtube.com/attribution_link?u=/watch?v=aGmiw_rrNxk&feature=share&a=9QlmP1yvjcllp0h3l0NwuA", "",
