@@ -5,6 +5,15 @@ Parses virtually any YouTube link that, when clicked, goes to a video, channel, 
 
 Just run `YoutubeUri.TryCreate("<YouTube URL>", out var youtubeUri)`, then `youtubeUri` will be `null` if it couldn't be found or it will contain the relavent info if it could be found. Also, the method will return `true`/`false` depending on if it could be found, just like the other `TryCreate` methods.
 
+## Goals
+
+- Be exceedingly well-tested by using real-world data (e.g. from Twitter's archive stream) and potentially cross-tested using other libraries. The test data of ~10 million unique links is being prepared.
+- Be able to parse any YouTube URL for any region whose information is contained within the URL and does not require the Internet or Intranet to retrieve any additional information or to resolve ambiguities; for example, this excludes URL shorteners which remove critical information.
+- The URL can be contained in the top 25 websites's redirect URLs (e.g. `https://facebook.com/l.php?u=https://...`.)
+- The URL must be able to be entered in a web-browser, official mobile app, or mobile web-browser and it should go to the video, channel, and/or playlist id that `YouTubeLinkParser` identifies; this excludes image URLs as they do not go to videos, and excludes text after normalization is not a valid URL.
+- Be as or more reliable than any combination of YouTube link parsers or video link parsers that are available to the public.
+- Stay up-to-date with new link formats.
+
 ## FAQ
 
 Q: There's already a bunch of YouTube link parsers, why is this one any different?
