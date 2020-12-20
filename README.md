@@ -10,9 +10,22 @@ Just run `YoutubeUri.TryCreate("<YouTube URL>", out var youtubeUri)`, then `yout
 - Be exceedingly well-tested by using real-world data (e.g. from Twitter's archive stream) and potentially cross-tested using other libraries. The test data of ~10 million unique links is being prepared.
 - Be able to parse any YouTube URL for any region whose information is contained within the URL and does not require the Internet or Intranet to retrieve any additional information or to resolve ambiguities; for example, this excludes URL shorteners which remove critical information.
 - The URL can be contained in the top 25 websites's redirect URLs (e.g. `https://facebook.com/l.php?u=https://...`.)
-- The URL must be able to be entered in a web-browser, official mobile app, or mobile web-browser and it should go to the video, channel, and/or playlist id that `YouTubeLinkParser` identifies; this excludes image URLs as they do not go to videos, and excludes text after normalization is not a valid URL.
+- The URL must be owned by one of the top 25 websites or owned by Google.
+- The URL must be able to be entered in a web-browser, official mobile app, or mobile web-browser and it should go to the video, channel, and/or playlist id that `YouTubeLinkParser` identifies; this excludes image URLs as they do not go to videos, and excludes normalized URLs which are not valid URLs.
+- Be flexible with the format, length, allowed characters, and character encoding of the video ids, channel ids, and playlist ids to allow for newly introduced URLs to still work and to assume that the user is correct.
+- Be able to support legacy URL formats if they were in use, were available to the public, and used by a non-trivial amount of people.
 - Be as or more reliable than any combination of YouTube link parsers or video link parsers that are available to the public.
+- Make the test cases easy to copy so that other developers can port this library to other languages or to test their own libraries.
 - Stay up-to-date with new link formats.
+
+## Roadmap
+
+- Migrate to a URL-routing table where the URL components are parameterized, defaulting to manual parsing logic if the URL is too complicated to be parsed using the routing rules. This is tracked in #1.
+- Programmatically check every link in the 10M dataset, determine if it is owned by Google (via SSL certs) or another top 25 ranked website, and then remove if it is not. Parse the links and ensure that no unexpected exceptions are thrown.
+- Create a distilled dataset which contains only the links which go through different code paths from the 10M dataset.
+- Do fuzz testing or ensure that it is impossible for the `TryCreate` method to throw an exception due to parsing or user code.
+- Periodically check YouTube's `sitemap.xml` file to keep up-to-date with reserved keywords.
+- Create a periodic CI job which automatically creates a new issue if a new URL format is being used frequently (e.g. check Twitter.)
 
 ## FAQ
 
