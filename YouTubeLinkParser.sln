@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLinkParser", "YouTubeLinkParser\YouTubeLinkParser.csproj", "{91BF25F8-611D-4714-B63E-1ACB807C5FDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLinkParser.Tests", "XUnitTestProject1\YouTubeLinkParser.Tests.csproj", "{45F070E4-978C-4338-98A2-D68D9C46E2A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLinkParser.Tests", "YouTubeLinkParser.Tests\YouTubeLinkParser.Tests.csproj", "{45F070E4-978C-4338-98A2-D68D9C46E2A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLinkParser.Demo", "YouTubeLinkParser.Demo\YouTubeLinkParser.Demo.csproj", "{B98CFBA3-3917-4B4F-A84C-D8617E23A753}"
 EndProject
