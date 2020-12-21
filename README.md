@@ -14,7 +14,6 @@ Just run `YoutubeUri.TryCreate("<YouTube URL>", out var youtubeUri)`, then `yout
 - The URL must be able to be entered in a web-browser, official mobile app, or mobile web-browser and it should go to the video, channel, and/or playlist id that `YouTubeLinkParser` identifies; this excludes image URLs as they do not go to videos, and excludes normalized URLs which are not valid URLs.
 - Be flexible with the format, length, allowed characters, and character encoding of the video ids, channel ids, and playlist ids to allow for newly introduced URLs to still work and to assume that the user is correct.
 - Be able to support legacy URL formats if they were in use, were available to the public, and used by a non-trivial amount of people.
-- Be as or more reliable than any combination of YouTube link parsers or video link parsers that are available to the public.
 - Make the test cases easy to copy so that other developers can port this library to other languages or to test their own libraries.
 - Stay up-to-date with new link formats.
 
