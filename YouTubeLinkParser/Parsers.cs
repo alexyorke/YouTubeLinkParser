@@ -29,6 +29,7 @@ namespace YouTubeLinkParser
                 case "results":
                 case "signup":
                 case "t":
+                case "e":
                 case "timedtext_video":
                 case "verify_age":
                 case "watch_ajax":
@@ -60,8 +61,10 @@ namespace YouTubeLinkParser
                 case "embed":
                 case "subscription_center":
                 case "v":
+                case "vi":
                 case "my_account":
                 case "playlist":
+                case "ytscreeningroom":
                 {
                     break;
                 }
@@ -123,18 +126,23 @@ namespace YouTubeLinkParser
             switch (pathComponents.FirstOrDefault())
             {
                 case "watch":
+                case "ytscreeningroom":
                 {
                     if (!string.IsNullOrWhiteSpace(queryString.Get("v")))
                         videoId = queryString.Get("v");
+                    else if (!string.IsNullOrWhiteSpace(queryString.Get("vi")))
+                        videoId = queryString.Get("vi");
                     else if (pathComponents.Count >= 2 && !string.IsNullOrWhiteSpace(pathComponents[1]))
                         videoId = pathComponents[1];
 
                     break;
                 }
                 case "v":
+                case "vi":
+                case "e":
                 {
                     if (pathComponents.Count >= 2 && !string.IsNullOrWhiteSpace(pathComponents[1]))
-                        videoId = pathComponents[1];
+                        videoId = pathComponents[1].Split("&").FirstOrDefault() ?? "";
 
                     break;
                 }
@@ -142,7 +150,21 @@ namespace YouTubeLinkParser
                 case "embed":
                 {
                     if (pathComponents.Count >= 2 && !string.IsNullOrWhiteSpace(pathComponents[1]))
-                        videoId = pathComponents[1] != "watch" ? pathComponents[1] : queryString.Get("v");
+                    {
+                            if (pathComponents[1] != "watch")
+                            {
+                                videoId = HttpUtility.UrlDecode(pathComponents[1]);
+
+                                if (videoId.Contains("?"))
+                                {
+                                    videoId = videoId.Split("?").First();
+                                }
+                            }
+                            else
+                            {
+                                videoId = queryString.Get("v");
+                            }
+                    }
 
                     break;
                 }
@@ -154,6 +176,9 @@ namespace YouTubeLinkParser
                         var user = queryString.Get("u");
 
                         videoId = HttpUtility.ParseQueryString(user.Split("?").LastOrDefault() ?? "").Get("v");
+                    } else if (pathComponents.Count >= 2 && pathComponents[1] == "watch")
+                    {
+                        //    
                     }
 
                     break;
@@ -161,6 +186,10 @@ namespace YouTubeLinkParser
 
                 case null:
                 {
+                    if (!string.IsNullOrWhiteSpace(queryString.Get("v")))
+                        videoId = queryString.Get("v");
+                    if (!string.IsNullOrWhiteSpace(queryString.Get("vi")))
+                        videoId = queryString.Get("vi");
                     break;
                 }
 

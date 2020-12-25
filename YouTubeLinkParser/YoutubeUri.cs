@@ -124,7 +124,7 @@ namespace YouTubeLinkParser
             get
             {
                 var validHosts = new List<string>
-                    {"youtu.be", "gaming.youtube.com", "tv.youtube.com", "youtubekids.com", "music.youtube.com"};
+                    {"youtu.be", "gaming.youtube.com", "tv.youtube.com", "youtubekids.com", "music.youtube.com", "youtube-nocookie.com", "youtube.googleapis.com"};
                 var tlds =
                     ("co.nz com.pk co.in net.in co.il co.jp co.za com.es co.th co.uk com ae" +
                      " at az ba be bg bh bo by ca ch cl co cr cz de dk ee es fi fr ge gr gt hk" +

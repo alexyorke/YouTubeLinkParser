@@ -212,6 +212,75 @@ namespace YouTubeLinkParser.Tests
         [InlineData(
             "https://www.youtube.com/channel/UCJ3wC_LyLPOrwhLpBu6KtnA?&ab_channel=UnsortedGaming-HaloForge,Custom",
             "UCJ3wC_LyLPOrwhLpBu6KtnA", "", "")]
+        // https://stackoverflow.com/questions/3452546/how-do-i-get-the-youtube-video-id-from-a-url
+        [InlineData("http://www.youtube.com/attribution_link?u=/watch?v=1p3vcRhsYGo&", "", "", "1p3vcRhsYGo")]
+        [InlineData("http://www.youtube.com/attribution_link?u=/watch?v=1p3vcRhsYGo", "", "", "1p3vcRhsYGo")]
+        [InlineData("http://www.youtube.com/user/username#p/a/u/2/videoidmaybe", "", "username", "videoidmaybe")] //?
+        [InlineData("http://www.youtube.com/user/username#p/u/1/videoidmaybe?", "", "username", "videoidmaybe")]//?
+        [InlineData("http://www.youtube.com/user/username#p/u/1/videoidmaybe", "", "username", "videoidmaybe")]//?
+        [InlineData("www.youtube-nocookie.com/embed/1p3vcRhsYGo?", "", "", "1p3vcRhsYGo")]
+        [InlineData("http://www.youtube.com/attribution_link?u=%2Fwatch%3Fv%3D*%26", "", "", "")]
+        [InlineData("http://www.youtube.com/attribution_link?u=%2Fwatch%3Fv%3D", "", "", "")]
+        [InlineData("http://www.youtube.com/watch?v=u8nQa1cJyX8&a=GxdCwVVULXctT2lYDEPllDR0LRTutYfW", "", "", "u8nQa1cJyX8")]
+        [InlineData("http://www.youtube.com/watch?v=u8nQa1cJyX8", "", "", "u8nQa1cJyX8")]
+        [InlineData("//www.youtube-nocookie.com/embed/up_lNV-yoK4?rel=0", "", "", "up_lNV-yoK4")]
+        [InlineData("http://www.youtube.com/user/Scobleizer#p/u/1/1p3vcRhsYGo", "", "Scobleizer", "1p3vcRhsYGo")]
+        [InlineData("http://www.youtube.com/user/SilkRoadTheatre#p/a/u/2/6dwqZw0j_jY", "", "SilkRoadTheatre", "6dwqZw0j_jY")]
+        [InlineData("http://youtu.be/6dwqZw0j_jY", "", "", "6dwqZw0j_jY")]
+        [InlineData("http://youtu.be/6dwqZw0j_jY ", "", "", "6dwqZw0j_jY")]
+        [InlineData("http://www.youtube.com/watch?v=6dwqZw0j_jY&feature=youtu.be", "", "", "6dwqZw0j_jY")]
+        [InlineData("http://youtu.be/afa-5HQHiAs", "", "", "afa-5HQHiAs")]
+        [InlineData("http://www.youtube.com/user/Scobleizer#p/u/1/1p3vcRhsYGo?rel=0", "", "Scobleizer", "1p3vcRhsYGo")]
+        [InlineData("http://www.youtube.com/watch?v=cKZDdG9FTKY&feature=channel", "", "", "cKZDdG9FTKY")]
+        [InlineData("http://www.youtube.com/watch?v=yZ-K7nCVnBI&playnext_from=TL&videos=osPknwzXEas&feature=sub", "", "", "yZ-K7nCVnBI")]
+        [InlineData("http://www.youtube.com/ytscreeningroom?v=NRHVzbJVx8I", "", "", "NRHVzbJVx8I")]
+        [InlineData("http://www.youtube.com/embed/nas1rJpm7wY?rel=0", "", "", "nas1rJpm7wY")]
+        [InlineData("http://www.youtube.com/watch?v=peFZbP64dsU", "", "", "peFZbP64dsU")]
+        [InlineData("http://youtube.com/v/dQw4w9WgXcQ?feature=youtube_gdata_player", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://youtube.com/vi/dQw4w9WgXcQ?feature=youtube_gdata_player", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://youtube.com/?v=dQw4w9WgXcQ&feature=youtube_gdata_player", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/watch?v=dQw4w9WgXcQ&feature=youtube_gdata_player", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://youtube.com/?vi=dQw4w9WgXcQ&feature=youtube_gdata_player", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://youtube.com/watch?v=dQw4w9WgXcQ&feature=youtube_gdata_player", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://youtube.com/watch?vi=dQw4w9WgXcQ&feature=youtube_gdata_player", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://youtu.be/dQw4w9WgXcQ?feature=youtube_gdata_player", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0", "", "", "0zM3nApSvMg")]
+        [InlineData("http://www.youtube.com/user/IngridMichaelsonVEVO#p/a/u/1/KdwsulMb8EQ", "", "IngridMichaelsonVEVO", "KdwsulMb8EQ")]
+        [InlineData("http://youtu.be/dQw4w9WgXcQ", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/embed/dQw4w9WgXcQ", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/v/dQw4w9WgXcQ", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/e/dQw4w9WgXcQ", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/watch?v=dQw4w9WgXcQ", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/?v=dQw4w9WgXcQ", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/watch?feature=player_embedded&v=dQw4w9WgXcQ", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/?feature=player_embedded&v=dQw4w9WgXcQ", "", "", "dQw4w9WgXcQ")]
+        [InlineData("http://www.youtube.com/user/IngridMichaelsonVEVO#p/u/11/KdwsulMb8EQ", "", "IngridMichaelsonVEVO", "KdwsulMb8EQ")]
+        [InlineData("http://www.youtube-nocookie.com/v/6L3ZvIMwZFM?version=3&hl=en_US&rel=0", "", "", "6L3ZvIMwZFM")]
+        [InlineData("http://www.youtube.com/v/0zM3nApSvMg?fs=1&amp;hl=en_US&amp;rel=0", "", "", "0zM3nApSvMg")]
+        [InlineData("http://www.youtube.com/embed/0zM3nApSvMg?rel=0", "", "", "0zM3nApSvMg")]
+        [InlineData("http://www.youtube.com/watch?v=JcjoGn6FLwI&asdasd", "", "", "JcjoGn6FLwI")]
+        [InlineData("http://www.youtube.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index", "", "", "0zM3nApSvMg")]
+        [InlineData("http://www.youtube.com/user/IngridMichaelsonVEVO#p/a/u/1/QdK8U-VIH_o", "", "IngridMichaelsonVEVO", "QdK8U-VIH_o")]
+        [InlineData("http://youtube.googleapis.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0", "", "", "0zM3nApSvMg")]
+        [InlineData("http://www.youtube.com/watch?v=0zM3nApSvMg#t=0m10s", "", "", "0zM3nApSvMg")]
+       
+        [InlineData("http://www.youtube.com/watch?v=0zM3nApSvMg", "", "", "0zM3nApSvMg")]
+        [InlineData("http://youtu.be/0zM3nApSvMg", "", "", "0zM3nApSvMg")]
+        [InlineData("http://www.youtube.com/watch?v=0zM3nApSvMg/", "", "", "0zM3nApSvMg")]
+        [InlineData("http://www.youtube.com/watch?feature=player_detailpage&v=8UVNT4wvIGY", "", "", "8UVNT4wvIGY")]
+        [InlineData("https://youtu.be/oTJRivZTMLs?list=PLToa5JuFMsXTNkrLJbRlB--76IAOjRM9b", "", "", "oTJRivZTMLs")]
+        [InlineData("http://www.youtube.com/watch?v=oTJRivZTMLs&feature=youtu.be", "", "", "oTJRivZTMLs")]
+        [InlineData("https://youtu.be/oTJRivZTMLs", "", "", "oTJRivZTMLs")]
+        [InlineData("http://youtu.be/oTJRivZTMLs&feature=channel", "", "", "oTJRivZTMLs")]
+        [InlineData("http://www.youtube.com/ytscreeningroom?v=oTJRivZTMLs", "", "", "oTJRivZTMLs")]
+        [InlineData("http://www.youtube.com/embed/oTJRivZTMLs?rel=0", "", "", "oTJRivZTMLs")]
+        [InlineData("http://youtube.com/v/oTJRivZTMLs&feature=channel", "", "", "oTJRivZTMLs")]
+        [InlineData("http://youtube.com/vi/oTJRivZTMLs&feature=channel", "", "", "oTJRivZTMLs")]
+        [InlineData("http://youtube.com/?v=oTJRivZTMLs&feature=channel", "", "", "oTJRivZTMLs")]
+        [InlineData("http://youtube.com/?feature=channel&v=oTJRivZTMLs", "", "", "oTJRivZTMLs")]
+        [InlineData("http://youtube.com/?vi=oTJRivZTMLs&feature=channel", "", "", "oTJRivZTMLs")]
+        [InlineData("http://youtube.com/watch?v=oTJRivZTMLs&feature=channel", "", "", "oTJRivZTMLs")]
+        [InlineData("http://youtube.com/watch?vi=oTJRivZTMLs&feature=channel", "", "", "oTJRivZTMLs")]
         public void TryParseValidUri(string url, string channelId, string userId, string videoId)
         {
             YoutubeUri.TryCreate(url, out var actual);
@@ -233,6 +302,14 @@ namespace YouTubeLinkParser.Tests
         public void CreateInvalidUrl()
         {
             Assert.Throws<FormatException>(() => new YoutubeUri("https://google.com/"));
+        }
+
+        [Fact(Skip = "specific reason")]
+        [InlineData("http://www.youtube.com/user/dreamtheater#p/u/1/oTJRivZTMLs", "", "dreamtheater", "oTJRivZTMLs")]
+        [InlineData("http://www.youtube.com/attribution_link?/watch?v=1p3vcRhsYGo", "", "", "1p3vcRhsYGo")]
+        public void SkippedTests()
+        {
+
         }
     }
 }
