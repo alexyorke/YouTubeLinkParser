@@ -140,14 +140,15 @@ namespace YouTubeLinkParser
                 }
             }
 
-            if (username.Contains(":"))
+            if (username.Contains(":") && !username.Contains("http:"))
                 return null;
-            else
-            {
-                username = username.Split("http://").FirstOrDefault() ?? "";
-                username = username.Split("https://").FirstOrDefault() ?? "";
-                return username;
-            }
+            
+            username = username.Split("http://").FirstOrDefault() ?? "";
+            username = username.Split("http:").FirstOrDefault() ?? "";
+            
+            username = username.Split("https://").FirstOrDefault() ?? "";
+            username = username.Split("https:").FirstOrDefault() ?? "";
+            return username;
         }
 
         internal static string? GetPlaylistId(NameValueCollection queryString, string fragment)
