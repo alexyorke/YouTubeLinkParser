@@ -6,6 +6,7 @@ namespace YouTubeLinkParser.Tests
     public class UnitTests
     {
         [Theory]
+        [InlineData("", "", "", "", "")]
         [InlineData("http://youtu.be", "", "", "", "")]
         [InlineData("https://youtu.be", "", "", "", "")]
         [InlineData("http://youtube.es", "", "", "", "")]
@@ -284,6 +285,30 @@ namespace YouTubeLinkParser.Tests
         [InlineData("http://youtube.com/watch?vi=oTJRivZTMLs&feature=channel", "", "", "oTJRivZTMLs", "")]
         [InlineData("http://www.youtube.com/user/dreamtheater#p/u/1/oTJRivZTMLs", "", "dreamtheater", "oTJRivZTMLs", "")]
         [InlineData("http://www.youtube.com/attribution_link?/watch?v=1p3vcRhsYGo", "", "", "1p3vcRhsYGo", "")]
+        [InlineData("https://www.youtube.com.br/watch?v=J6MpBhzbRmI", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("https://www.youtube.com.sg/watch?v=J6MpBhzbRmI", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("https://www.youtube.com.co/watch?v=J6MpBhzbRmI", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("https://www.youtube/watch?v=J6MpBhzbRmI", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("http://www.youtube.com/watch?v=n1fhd1EzSikhttp://", "", "", "n1fhd1EzSik", "")]
+        [InlineData("https://m.youtube.com/?gl=FI&hl=fi#/channel/UClCyQF7zEc22V19fShOlmEw", "UClCyQF7zEc22V19fShOlmEw", "", "", "")]
+        [InlineData("https://m.youtube.com/?gl=MX&hl=es-419#/channel/UCKY2C2DEDpfjajrGedD9-Qg", "UCKY2C2DEDpfjajrGedD9-Qg", "", "", "")]
+        [InlineData("https://m.youtube.com/?noapp=1#/channel/UC2Lqybb1xm9lXBU4QFEuCaw?noapp=1", "UC2Lqybb1xm9lXBU4QFEuCaw", "", "", "")]
+        [InlineData("https://m.youtube.com/?noapp=1#/channel/UCJSoKroyNMMCxwOiJRNGEUw?noapp=1&app=m&persist_app=1", "UCJSoKroyNMMCxwOiJRNGEUw", "", "", "")]
+        [InlineData("https://m.youtube.com/?noapp=1#/user/ObliviousAnimeGirl?noapp=1", "", "ObliviousAnimeGirl", "", "")]
+        [InlineData("https://m.youtube.com/?reload=7&rdm=1l9werhe#/watch?list=PL05E26E091BDF1DFA&v=aYrqwsHHalM", "", "", "aYrqwsHHalM", "PL05E26E091BDF1DFA")]
+        [InlineData("https://m.youtube.com/?reload=7&rdm=1mapy41ih#/channel/UC1hrmEG9Lgj6s2LbcGQJJ6A", "UC1hrmEG9Lgj6s2LbcGQJJ6A", "", "", "")]
+        [InlineData("https://m.youtube.com/?reload=7&rdm=2ehouu60s#/watch?v=Xa2_PInngII", "", "", "Xa2_PInngII", "")]
+        [InlineData("https://m.youtube.com/?reload=7&rdm=2fk82q2ph#/channel/UCdkjthibw6_8X8aLHb7fzwg", "UCdkjthibw6_8X8aLHb7fzwg", "", "", "")]
+        [InlineData("https://m.youtube.com/?reload=7&rdm=2fk82q71#/channel/UCa2hwtqYBp-nCfn-dd2bqDw", "UCa2hwtqYBp-nCfn-dd2bqDw", "", "", "")]
+        [InlineData("https://m.youtube.com/?reload=7&rdm=2gzcg67km#/watch?v=NLiWFUDJ95I", "", "", "NLiWFUDJ95I", "")]
+        [InlineData("https://www.youtube.com/attribution_link?a=8d24G6ulBEpASrj5&u=/channel/UC3vBLJ_3rXevCJ_keDOPddA?feat", "UC3vBLJ_3rXevCJ_keDOPddA", "", "", "")]
+        [InlineData("https://www.youtube.com/attribution_link?a=vGc4r4OsijuPt38V&u=/channel/UCzFlYStVgoieXzwLZ9J7n4w", "UCzFlYStVgoieXzwLZ9J7n4w", "", "", "")]
+        [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRmI?_confirmation=1", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRmI?_confirmation=1", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("\"https://www.youtube.com/watch?v=J6MpBhzbRmI\"", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("'https://www.youtube.com/watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("'https://www.youtube.com./watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("'https://www.youtube.com.br./watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRmI", "")]
         public void TryParseValidUri(string url, string channelId, string userId, string videoId, string playlistId)
         {
             YoutubeUri.TryCreate(url, out var actual);

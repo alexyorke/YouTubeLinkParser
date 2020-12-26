@@ -56,7 +56,7 @@ namespace YouTubeLinkParser
         {
             youtubeUri = new YoutubeUri();
 
-            unparsedYouTubeUri = unparsedYouTubeUri.Trim();
+            unparsedYouTubeUri = unparsedYouTubeUri.Trim().Trim('\'').Trim('\"');
 
             // Uri.TryCreate requires that the URL has a protocol
             var httpPrefixedUnparsedYouTubeLink = unparsedYouTubeUri;
@@ -106,10 +106,10 @@ namespace YouTubeLinkParser
 
             var queryString = HttpUtility.ParseQueryString(parsedYouTubeLink.Query);
 
-            var channelId = Parsers.GetChannelId(pathComponents, domain == "youtu.be" || domain == "www.youtu.be");
-            var userId = Parsers.GetUserId(pathComponents, queryString);
+            var channelId = Parsers.GetChannelId(pathComponents, queryString, domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
+            var userId = Parsers.GetUserId(pathComponents, queryString, parsedYouTubeLink.Fragment);
             var videoId = Parsers.GetVideoId(pathComponents, queryString, domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
-            var playlistId = Parsers.GetPlaylistId(queryString);
+            var playlistId = Parsers.GetPlaylistId(queryString, parsedYouTubeLink.Fragment);
 
             if (!string.IsNullOrWhiteSpace(channelId) || !string.IsNullOrWhiteSpace(videoId) ||
                 !string.IsNullOrWhiteSpace(userId) || !string.IsNullOrWhiteSpace(playlistId))
@@ -130,12 +130,22 @@ namespace YouTubeLinkParser
             get
             {
                 var validHosts = new List<string>
-                    {"youtu.be", "gaming.youtube.com", "tv.youtube.com", "youtubekids.com", "music.youtube.com", "youtube-nocookie.com", "youtube.googleapis.com"};
+                    {
+                    "youtu.be",
+                    "gaming.youtube.com",
+                    "tv.youtube.com",
+                    "youtubekids.com",
+                    "music.youtube.com",
+                    "youtube-nocookie.com",
+                    "youtube.googleapis.com",
+                    "youtube"
+                };
                 var tlds =
                     ("co.nz com.pk co.in net.in co.il co.jp co.za com.es co.th co.uk com ae" +
-                     " at az ba be bg bh bo by ca ch cl co cr cz de dk ee es fi fr ge gr gt hk" +
+                     " at az ba be bg bh bo br by ca ch cl co cr cz de dk ee es fi fr ge gr gt hk" +
                      " hr hu ie in iq is it jo jp kr kz lk lt lu lv ly ma me mk mx my ng ni nl" +
-                     " no pa pe ph pk pl pr pt qa ro rs ru sa se sg si sk sn sv tn ua ug uy vn"
+                     " no pa pe ph pk pl pr pt qa ro rs ru sa se sg si sk sn sv tn ua ug uy vn" +
+                     " com.sg com.co com.br"
                     ).Split(" ").ToList();
 
                 validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}"));

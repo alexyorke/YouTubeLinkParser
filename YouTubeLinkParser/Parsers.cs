@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -8,7 +10,7 @@ namespace YouTubeLinkParser
 {
     internal class Parsers
     {
-        internal static string? GetChannelId(IReadOnlyList<string> pathComponents, bool isShortUrl)
+        internal static string? GetChannelId(IReadOnlyList<string> pathComponents, NameValueCollection queryString, bool isShortUrl, string fragment)
         {
             string? channelId = null;
             switch (pathComponents.FirstOrDefault())
@@ -57,7 +59,6 @@ namespace YouTubeLinkParser
                 case "profile":
                 case "user":
                 case "watch":
-                case "attribution_link":
                 case "embed":
                 case "subscription_center":
                 case "v":
@@ -68,23 +69,38 @@ namespace YouTubeLinkParser
                 {
                     break;
                 }
+                case "attribution_link":
+                {
+                    if (!string.IsNullOrWhiteSpace(queryString.Get("u")))
+                    {
+                        channelId = Path.GetFileName(queryString.Get("u"));
+                    }
+                    break;
+                }
                 default:
                 {
                     if (!isShortUrl && pathComponents.Count >= 1 && !string.IsNullOrWhiteSpace(pathComponents[0]))
+                    {
                         channelId = pathComponents[0];
+                    }
+                    else if (Regex.IsMatch(fragment, @"#/channel/([a-zA-Z0-9])"))
+                    {
+                        channelId = fragment.Split(@"#/channel/").LastOrDefault().Split("?").FirstOrDefault().Split("&").FirstOrDefault();
+                    }
 
                     break;
                 }
             }
 
             channelId = HttpUtility.UrlDecode(channelId ?? "");
+            channelId = channelId.Split("?").FirstOrDefault() ?? "";
 
             return Regex.IsMatch(HttpUtility.UrlEncode(Services.RemoveDiacritics(channelId)), @"[a-zA-Z0-9\-_\%\+]{1,}")
                 ? channelId
                 : null;
         }
 
-        internal static string? GetUserId(IReadOnlyList<string> pathComponents, NameValueCollection queryString)
+        internal static string? GetUserId(IReadOnlyList<string> pathComponents, NameValueCollection queryString, string fragment)
         {
             string username = "";
             switch (pathComponents.FirstOrDefault())
@@ -113,15 +129,38 @@ namespace YouTubeLinkParser
                 }
 
                 default:
-                    return null;
+                {
+                    if (!Regex.IsMatch(fragment, @"#/user/([a-zA-Z0-9])")) return null;
+                    username = fragment.Split(@"#/user/").LastOrDefault().Split("?").FirstOrDefault().Split("&").FirstOrDefault() ?? string.Empty;
+                    break;
+                }
             }
 
             return username.Contains(":") ? null : username;
         }
 
-        internal static string? GetPlaylistId(NameValueCollection queryString)
+        internal static string? GetPlaylistId(NameValueCollection queryString, string fragment)
         {
-            return string.IsNullOrWhiteSpace(queryString.Get("list")) ? null : queryString.Get("list");
+            if (string.IsNullOrWhiteSpace(queryString.Get("list")))
+            {
+                if (!fragment.StartsWith("#")) return null;
+                
+                fragment = fragment.Substring(1, fragment.Length - 1);
+                var fragmentParsed = HttpUtility.ParseQueryString(fragment);
+                if (!string.IsNullOrWhiteSpace(fragmentParsed.Get("list")))
+                {
+                    return fragmentParsed.Get("list");
+                }
+                if (!string.IsNullOrWhiteSpace(fragmentParsed.Get("/watch?list")))
+                {
+                    return fragmentParsed.Get("/watch?list");
+                }
+            } else
+            {
+                return queryString.Get("list");
+            }
+
+            return null;
         }
 
         internal static string? GetVideoId(IReadOnlyList<string> pathComponents, NameValueCollection queryString,
@@ -137,6 +176,10 @@ namespace YouTubeLinkParser
                         videoId = queryString.Get("v");
                     else if (!string.IsNullOrWhiteSpace(queryString.Get("vi")))
                         videoId = queryString.Get("vi");
+                    else if (!string.IsNullOrWhiteSpace(queryString.Get("video_src")))
+                        videoId = queryString.Get("video_src");
+                    else if (!string.IsNullOrWhiteSpace(queryString.Get("src_vid")))
+                        videoId = queryString.Get("src_vid");
                     else if (pathComponents.Count >= 2 && !string.IsNullOrWhiteSpace(pathComponents[1]))
                         videoId = pathComponents[1];
 
@@ -190,11 +233,23 @@ namespace YouTubeLinkParser
                 }
 
                 case null:
-                {
+                { 
                     if (!string.IsNullOrWhiteSpace(queryString.Get("v")))
                         videoId = queryString.Get("v");
-                    if (!string.IsNullOrWhiteSpace(queryString.Get("vi")))
+                    else if (!string.IsNullOrWhiteSpace(queryString.Get("vi")))
                         videoId = queryString.Get("vi");
+                    else
+                    {
+                        if (fragment.StartsWith("#"))
+                        {
+                            fragment = fragment.Substring(1, fragment.Length - 1);
+                            var fragmentParsed = HttpUtility.ParseQueryString(fragment);
+                            if (!string.IsNullOrWhiteSpace(fragmentParsed.Get("v")))
+                                videoId = fragmentParsed.Get("v");
+                            else if (!string.IsNullOrWhiteSpace(fragmentParsed.Get("/watch?v")))
+                                videoId = fragmentParsed.Get("/watch?v");
+                        }
+                    }
                     break;
                 }
 
@@ -202,6 +257,10 @@ namespace YouTubeLinkParser
                 {
                     if (isShortUrl && pathComponents.Count == 1 && !string.IsNullOrWhiteSpace(pathComponents[0]))
                         videoId = pathComponents[0].Split("&").FirstOrDefault();
+                    else if (Regex.IsMatch(fragment, @"#/watch\?v=([a-zA-Z0-9\:\/\/]{8,})"))
+                    {
+                        videoId = fragment.Split(@"#/watch?v=").LastOrDefault();
+                    }
 
                     break;
                 }
@@ -224,6 +283,11 @@ namespace YouTubeLinkParser
         {
             // if the video ID contains a URL-encoded slash (or a regular slash) YouTube will just parse the first part
             videoId = HttpUtility.UrlDecode(videoId);
+
+            videoId = videoId.Replace("http://", "", StringComparison.InvariantCultureIgnoreCase);
+            videoId = videoId.Replace("https://", "", StringComparison.InvariantCultureIgnoreCase);
+
+            videoId = videoId.Split("?").FirstOrDefault();
 
             if (videoId.Contains("/")) videoId = videoId.Split("/").First();
 
