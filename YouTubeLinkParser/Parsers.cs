@@ -65,6 +65,7 @@ namespace YouTubeLinkParser
                 case "my_account":
                 case "playlist":
                 case "ytscreeningroom":
+                case "intl":
                 {
                     break;
                 }
