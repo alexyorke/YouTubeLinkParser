@@ -131,7 +131,7 @@ namespace YouTubeLinkParser.Tests
             "", "fcc484IPwms", "")]
         [InlineData(
             "https://www.youtube.com/watch?v=ffxKSjUwKdUhttps://open.spotify.com/user/sofh6n1bkas3dhfr06x2u9lie/p", "",
-            "", "", "")]
+            "", "ffxKSjUwKdU", "")]
         [InlineData(
             "https://www.youtube.com/watch?v=q4-fKQ4C8kY&feature=gp-n-y&google_comment_id=z12syd54wxrijdmeh23syd0", "",
             "", "q4-fKQ4C8kY", "")]
