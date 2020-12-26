@@ -66,15 +66,8 @@ namespace YouTubeLinkParser
                 case "my_account":
                 case "playlist":
                 case "ytscreeningroom":
-                {
-                    break;
-                }
                 case "attribution_link":
                 {
-                    if (!string.IsNullOrWhiteSpace(queryString.Get("u")))
-                    {
-                        channelId = Path.GetFileName(queryString.Get("u"));
-                    }
                     break;
                 }
                 default:
