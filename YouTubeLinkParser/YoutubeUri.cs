@@ -7,11 +7,6 @@ namespace YouTubeLinkParser
 {
     public class YoutubeUri
     {
-        public string? ChannelId { get; private set; }
-        public string? UserId { get; private set; }
-        public string? VideoId { get; private set; }
-        public string? PlaylistId { get; private set; }
-
         // ReSharper disable once MemberCanBePrivate.Global
         public YoutubeUri()
         {
@@ -28,6 +23,11 @@ namespace YouTubeLinkParser
             PlaylistId = uri?.PlaylistId;
         }
 
+        public string? ChannelId { get; private set; }
+        public string? UserId { get; private set; }
+        public string? VideoId { get; private set; }
+        public string? PlaylistId { get; private set; }
+
         public Uri? Uri
         {
             get
@@ -36,18 +36,54 @@ namespace YouTubeLinkParser
 
                 if (!string.IsNullOrWhiteSpace(VideoId)) return new Uri($"https://youtube.com/v/{VideoId}");
 
-                if (!string.IsNullOrWhiteSpace(PlaylistId)) return new Uri($"https://youtube.com/playlist?list={PlaylistId}");
+                if (!string.IsNullOrWhiteSpace(PlaylistId))
+                    return new Uri($"https://youtube.com/playlist?list={PlaylistId}");
 
                 return !string.IsNullOrWhiteSpace(UserId) ? new Uri($"https://youtube.com/u/{UserId}") : null;
             }
         }
 
+        private static HashSet<string> ValidHosts
+        {
+            get
+            {
+                var validHosts = new List<string>
+                {
+                    "youtu.be",
+                    "gaming.youtube.com",
+                    "tv.youtube.com",
+                    "youtubekids.com",
+                    "music.youtube.com",
+                    "youtube-nocookie.com",
+                    "youtube.googleapis.com",
+                    "youtube"
+                };
+                var tlds =
+                    ("com.ar co.nz com.pk co.in net.in co.il co.jp co.za com.es co.th co.uk com ae" +
+                     " at az ba be bg bh bo br by ca ch cl co cr cz de dk ee es fi fr ge gr gt hk" +
+                     " hr hu ie in iq is it jo jp kr kz lk lt lu lv ly ma me mk mx my ng ni nl" +
+                     " no pa pe ph pk pl pr pt qa ro rs ru sa se sg si sk sn sv tn ua ug uy vn" +
+                     " com.sg com.co com.br com.au com.bd com.cy com.do com.dz com.ec com.eg com.gh" +
+                     " com.hn com.id com.jm com.ke com.kw com.lb com.li com.mt com.np com.om com.pg" +
+                     " com.py com.tr com.tw com.tz com.ve com.ye com.zw"
+                    ).Split(" ").ToList();
+
+                validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}"));
+                validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}."));
+                validHosts.AddRange(tlds.Where(tld => !tld.Contains(".")).Select(tld => $"{tld}.youtube.com"));
+                validHosts.AddRange(tlds.Select(tld => $"m.youtube.{tld}"));
+                validHosts.AddRange(tlds.Select(tld => $"www.youtube.{tld}"));
+                return new HashSet<string>(validHosts, StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
         /// <summary>
-        /// Try to parse a given YouTube URL. Accepts any unparsed YouTube URL which can be opened using any modern desktop web-browser,
-        /// assuming that there are no HTTP-level redirects from a different domain.
-        ///
-        /// If a link shortener or a redirection domain is used, it has to be resolved and redirected to the final location before
-        /// using this parser.
+        ///     Try to parse a given YouTube URL. Accepts any unparsed YouTube URL which can be opened using any modern desktop
+        ///     web-browser,
+        ///     assuming that there are no HTTP-level redirects from a different domain.
+        ///     If a link shortener or a redirection domain is used, it has to be resolved and redirected to the final location
+        ///     before
+        ///     using this parser.
         /// </summary>
         /// <param name="unparsedYouTubeUri">The unparsed YouTube URL.</param>
         /// <param name="youtubeUri">The parsed YouTube URL, otherwise null if it could not be parsed.</param>
@@ -106,9 +142,11 @@ namespace YouTubeLinkParser
 
             var queryString = HttpUtility.ParseQueryString(parsedYouTubeLink.Query);
 
-            var channelId = Parsers.GetChannelId(pathComponents, queryString, domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
+            var channelId = Parsers.GetChannelId(pathComponents, queryString,
+                domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
             var userId = Parsers.GetUserId(pathComponents, queryString, parsedYouTubeLink.Fragment);
-            var videoId = Parsers.GetVideoId(pathComponents, queryString, domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
+            var videoId = Parsers.GetVideoId(pathComponents, queryString,
+                domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
             var playlistId = Parsers.GetPlaylistId(queryString, parsedYouTubeLink.Fragment);
 
             if (!string.IsNullOrWhiteSpace(channelId) || !string.IsNullOrWhiteSpace(videoId) ||
@@ -125,43 +163,11 @@ namespace YouTubeLinkParser
             return false;
         }
 
-        private static HashSet<string> ValidHosts
+        public override bool Equals(object? obj)
         {
-            get
-            {
-                var validHosts = new List<string>
-                    {
-                    "youtu.be",
-                    "gaming.youtube.com",
-                    "tv.youtube.com",
-                    "youtubekids.com",
-                    "music.youtube.com",
-                    "youtube-nocookie.com",
-                    "youtube.googleapis.com",
-                    "youtube"
-                };
-                var tlds =
-                    ("com.ar co.nz com.pk co.in net.in co.il co.jp co.za com.es co.th co.uk com ae" +
-                     " at az ba be bg bh bo br by ca ch cl co cr cz de dk ee es fi fr ge gr gt hk" +
-                     " hr hu ie in iq is it jo jp kr kz lk lt lu lv ly ma me mk mx my ng ni nl" +
-                     " no pa pe ph pk pl pr pt qa ro rs ru sa se sg si sk sn sv tn ua ug uy vn" +
-                     " com.sg com.co com.br com.au com.bd com.cy com.do com.dz com.ec com.eg com.gh" +
-                     " com.hn com.id com.jm com.ke com.kw com.lb com.li com.mt com.np com.om com.pg" +
-                     " com.py com.tr com.tw com.tz com.ve com.ye com.zw"
-                    ).Split(" ").ToList();
-
-                validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}"));
-                validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}."));
-                validHosts.AddRange(tlds.Where(tld => !tld.Contains(".")).Select(tld => $"{tld}.youtube.com"));
-                validHosts.AddRange(tlds.Select(tld => $"m.youtube.{tld}"));
-                validHosts.AddRange(tlds.Select(tld => $"www.youtube.{tld}"));
-                return new HashSet<string>(validHosts, StringComparer.OrdinalIgnoreCase);
-            }
+            return obj != null && ((YoutubeUri) obj).VideoId == VideoId &&
+                   ((YoutubeUri) obj).ChannelId == ChannelId && ((YoutubeUri) obj).VideoId == VideoId;
         }
-
-        public override bool Equals(object? obj) =>
-            obj != null && ((YoutubeUri) obj).VideoId == VideoId &&
-            ((YoutubeUri) obj).ChannelId == ChannelId && (((YoutubeUri) obj).VideoId) == VideoId;
 
         public override int GetHashCode()
         {
