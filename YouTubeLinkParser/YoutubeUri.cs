@@ -49,24 +49,134 @@ namespace YouTubeLinkParser
             {
                 var validHosts = new List<string>
                 {
-                    "youtu.be",
                     "gaming.youtube.com",
-                    "tv.youtube.com",
-                    "youtubekids.com",
                     "music.youtube.com",
+                    "tv.youtube.com",
+                    "youtu.be",
+                    "yt.be",
+                    "youtube",
                     "youtube-nocookie.com",
                     "youtube.googleapis.com",
-                    "youtube"
+                    "youtubekids.com"
                 };
-                var tlds =
-                    ("com.ar co.nz com.pk co.in net.in co.il co.jp co.za com.es co.th co.uk com ae" +
-                     " at az ba be bg bh bo br by ca ch cl co cr cz de dk ee es fi fr ge gr gt hk" +
-                     " hr hu ie in iq is it jo jp kr kz lk lt lu lv ly ma me mk mx my ng ni nl" +
-                     " no pa pe ph pk pl pr pt qa ro rs ru sa se sg si sk sn sv tn ua ug uy vn" +
-                     " com.sg com.co com.br com.au com.bd com.cy com.do com.dz com.ec com.eg com.gh" +
-                     " com.hn com.id com.jm com.ke com.kw com.lb com.li com.mt com.np com.om com.pg" +
-                     " com.py com.tr com.tw com.tz com.ve com.ye com.zw"
-                    ).Split(" ").ToList();
+                var tlds = new List<string>
+                {
+                    "ae",
+                    "at",
+                    "az",
+                    "ba",
+                    "be",
+                    "bg",
+                    "bh",
+                    "bo",
+                    "br",
+                    "by",
+                    "ca",
+                    "ch",
+                    "cl",
+                    "co",
+                    "co.il",
+                    "co.in",
+                    "co.jp",
+                    "co.nz",
+                    "co.th",
+                    "co.uk",
+                    "co.za",
+                    "com",
+                    "com.ar",
+                    "com.au",
+                    "com.bd",
+                    "com.br",
+                    "com.co",
+                    "com.cy",
+                    "com.do",
+                    "com.dz",
+                    "com.ec",
+                    "com.eg",
+                    "com.es",
+                    "com.gh",
+                    "com.hn",
+                    "com.id",
+                    "com.jm",
+                    "com.ke",
+                    "com.kw",
+                    "com.lb",
+                    "com.li",
+                    "com.mt",
+                    "com.np",
+                    "com.om",
+                    "com.pg",
+                    "com.pk",
+                    "com.py",
+                    "com.sg",
+                    "com.tr",
+                    "com.tw",
+                    "com.tz",
+                    "com.ve",
+                    "com.ye",
+                    "com.zw",
+                    "cr",
+                    "cz",
+                    "de",
+                    "dk",
+                    "ee",
+                    "es",
+                    "fi",
+                    "fr",
+                    "ge",
+                    "gr",
+                    "gt",
+                    "hk",
+                    "hr",
+                    "hu",
+                    "ie",
+                    "in",
+                    "iq",
+                    "is",
+                    "it",
+                    "jo",
+                    "jp",
+                    "kr",
+                    "kz",
+                    "lk",
+                    "lt",
+                    "lu",
+                    "lv",
+                    "ly",
+                    "ma",
+                    "me",
+                    "mk",
+                    "mx",
+                    "my",
+                    "net.in",
+                    "ng",
+                    "ni",
+                    "nl",
+                    "no",
+                    "pa",
+                    "pe",
+                    "ph",
+                    "pk",
+                    "pl",
+                    "pr",
+                    "pt",
+                    "qa",
+                    "ro",
+                    "rs",
+                    "ru",
+                    "sa",
+                    "se",
+                    "sg",
+                    "si",
+                    "sk",
+                    "sn",
+                    "sv",
+                    "tn",
+                    "ua",
+                    "ug",
+                    "uy",
+                    "vn"
+                };    
 
                 validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}"));
                 validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}."));
@@ -142,11 +252,12 @@ namespace YouTubeLinkParser
 
             var queryString = HttpUtility.ParseQueryString(parsedYouTubeLink.Query);
 
+            var isShortUrl = domain == "youtu.be" || domain == "www.youtu.be" || domain == "www.yt.be" || domain == "yt.be";
             var channelId = Parsers.GetChannelId(pathComponents, queryString,
-                domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
+                isShortUrl, parsedYouTubeLink.Fragment);
             var userId = Parsers.GetUserId(pathComponents, queryString, parsedYouTubeLink.Fragment);
             var videoId = Parsers.GetVideoId(pathComponents, queryString,
-                domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
+                isShortUrl, parsedYouTubeLink.Fragment);
             var playlistId = Parsers.GetPlaylistId(queryString, parsedYouTubeLink.Fragment);
 
             if (!string.IsNullOrWhiteSpace(channelId) || !string.IsNullOrWhiteSpace(videoId) ||
