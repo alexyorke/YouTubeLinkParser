@@ -95,6 +95,9 @@ namespace YouTubeLinkParser
             channelId = HttpUtility.UrlDecode(channelId ?? "");
             channelId = channelId.Split("?").FirstOrDefault() ?? "";
 
+            channelId = channelId.Split("http://").FirstOrDefault() ?? "";
+            channelId = channelId.Split("https://").FirstOrDefault() ?? "";
+
             return Regex.IsMatch(HttpUtility.UrlEncode(Services.RemoveDiacritics(channelId)), @"[a-zA-Z0-9\-_\%\+]{1,}")
                 ? channelId
                 : null;
@@ -136,7 +139,14 @@ namespace YouTubeLinkParser
                 }
             }
 
-            return username.Contains(":") ? null : username;
+            if (username.Contains(":"))
+                return null;
+            else
+            {
+                username = username.Split("http://").FirstOrDefault() ?? "";
+                username = username.Split("https://").FirstOrDefault() ?? "";
+                return username;
+            }
         }
 
         internal static string? GetPlaylistId(NameValueCollection queryString, string fragment)
@@ -284,10 +294,10 @@ namespace YouTubeLinkParser
             // if the video ID contains a URL-encoded slash (or a regular slash) YouTube will just parse the first part
             videoId = HttpUtility.UrlDecode(videoId);
 
-            videoId = videoId.Replace("http://", "", StringComparison.InvariantCultureIgnoreCase);
-            videoId = videoId.Replace("https://", "", StringComparison.InvariantCultureIgnoreCase);
+            videoId = videoId.Split("http://").FirstOrDefault() ?? "";
+            videoId = videoId.Split("https://").FirstOrDefault() ?? "";
 
-            videoId = videoId.Split("?").FirstOrDefault();
+            videoId = videoId.Split("?").FirstOrDefault() ?? "";
 
             if (videoId.Contains("/")) videoId = videoId.Split("/").First();
 
