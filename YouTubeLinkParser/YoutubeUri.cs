@@ -176,13 +176,16 @@ namespace YouTubeLinkParser
                     "ug",
                     "uy",
                     "vn"
-                };    
+                };
 
+                validHosts.AddRange(validHosts.ToList().Select(host => $"{host}."));
+                
                 validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}"));
                 validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}."));
                 validHosts.AddRange(tlds.Where(tld => !tld.Contains(".")).Select(tld => $"{tld}.youtube.com"));
                 validHosts.AddRange(tlds.Select(tld => $"m.youtube.{tld}"));
                 validHosts.AddRange(tlds.Select(tld => $"www.youtube.{tld}"));
+
                 return new HashSet<string>(validHosts, StringComparer.OrdinalIgnoreCase);
             }
         }
