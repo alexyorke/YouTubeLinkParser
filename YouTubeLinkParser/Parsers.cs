@@ -267,7 +267,7 @@ namespace YouTubeLinkParser
 
                 default:
                 {
-                    if (isShortUrl && pathComponents.Count == 1 && !string.IsNullOrWhiteSpace(pathComponents[0]))
+                    if (isShortUrl && pathComponents.Count >= 1 && !string.IsNullOrWhiteSpace(pathComponents[0]))
                         videoId = pathComponents[0].Split("&").FirstOrDefault();
                     else if (Regex.IsMatch(fragment, @"#/watch\?v=([a-zA-Z0-9\:\/\/]{8,})"))
                     {

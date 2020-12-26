@@ -310,6 +310,7 @@ namespace YouTubeLinkParser.Tests
         [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRmhttps://example.com", "", "", "J6MpBhzbRm", "")]
         [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRm|xyz", "", "", "J6MpBhzbRm", "")]
         [InlineData("http://www.youtube.com/user/ChakalXGamerhttp://", "", "ChakalXGamer", "", "")]
+        [InlineData("https://youtu.be/tXT9Uh42dqk/Yo", "", "", "tXT9Uh42dqk", "")]
         public void TryParseValidUri(string url, string channelId, string userId, string videoId, string playlistId)
         {
             YoutubeUri.TryCreate(url, out var actual);
