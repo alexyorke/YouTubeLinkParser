@@ -119,8 +119,13 @@ namespace YouTubeLinkParser
             return username.Contains(":") ? null : username;
         }
 
+        internal static string? GetPlaylistId(NameValueCollection queryString)
+        {
+            return string.IsNullOrWhiteSpace(queryString.Get("list")) ? null : queryString.Get("list");
+        }
+
         internal static string? GetVideoId(IReadOnlyList<string> pathComponents, NameValueCollection queryString,
-            bool isShortUrl)
+            bool isShortUrl, string fragment)
         {
             string? videoId = null;
             switch (pathComponents.FirstOrDefault())
@@ -176,9 +181,9 @@ namespace YouTubeLinkParser
                         var user = queryString.Get("u");
 
                         videoId = HttpUtility.ParseQueryString(user.Split("?").LastOrDefault() ?? "").Get("v");
-                    } else if (pathComponents.Count >= 2 && pathComponents[1] == "watch")
+                    } else if (Regex.IsMatch(queryString.ToString() ?? string.Empty, @"\/watch\?v=[a-zA-Z0-9_-]{8,14}$"))
                     {
-                        //    
+                        videoId = queryString.ToString()?.Split("v=").LastOrDefault();
                     }
 
                     break;
@@ -196,23 +201,40 @@ namespace YouTubeLinkParser
                 default:
                 {
                     if (isShortUrl && pathComponents.Count == 1 && !string.IsNullOrWhiteSpace(pathComponents[0]))
-                        videoId = pathComponents[0];
+                        videoId = pathComponents[0].Split("&").FirstOrDefault();
 
                     break;
                 }
             }
 
 
-            if (videoId == null) return videoId;
+            if (videoId == null)
+            {
+                if (!fragment.StartsWith("#p/a/u/") && !fragment.StartsWith("#p/u/")) return videoId;
+                
+                var fragmentVideoId = fragment.Split(@"/").LastOrDefault();
+                if (fragmentVideoId != null) fragmentVideoId = fragmentVideoId.Split("?").FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(fragmentVideoId)) videoId = fragmentVideoId;
+            }
 
+            return CleanVideoId(videoId);
+        }
+
+        private static string? CleanVideoId(string videoId)
+        {
             // if the video ID contains a URL-encoded slash (or a regular slash) YouTube will just parse the first part
             videoId = HttpUtility.UrlDecode(videoId);
 
             if (videoId.Contains("/")) videoId = videoId.Split("/").First();
 
-            if (!Regex.IsMatch(videoId ?? string.Empty, @"^[a-zA-Z0-9_-]{8,14}$")) videoId = null;
-
-            return videoId;
+            // YouTube will remove all characters after a video id until it matches one in its database. This is a crude approximation because
+            // it is impossible to match exactly as we'd need to know every video in YouTube's database.
+            return !Regex.IsMatch(videoId ?? string.Empty,
+                @"^[a-zA-Z0-9_-]{8,14}$")
+                ? null
+                : Regex.Split(videoId,
+                        "[^a-zA-Z0-9_-]")
+                    .First();
         }
     }
 }

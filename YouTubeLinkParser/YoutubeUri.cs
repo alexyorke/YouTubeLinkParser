@@ -10,6 +10,7 @@ namespace YouTubeLinkParser
         public string? ChannelId;
         public string? UserId;
         public string? VideoId;
+        public string? PlaylistId;
 
         // ReSharper disable once MemberCanBePrivate.Global
         public YoutubeUri()
@@ -24,6 +25,7 @@ namespace YouTubeLinkParser
             ChannelId = uri?.ChannelId;
             VideoId = uri?.VideoId;
             UserId = uri?.UserId;
+            PlaylistId = uri?.PlaylistId;
         }
 
         public Uri? Uri
@@ -33,6 +35,8 @@ namespace YouTubeLinkParser
                 if (!string.IsNullOrWhiteSpace(ChannelId)) return new Uri($"https://youtube.com/c/{ChannelId}");
 
                 if (!string.IsNullOrWhiteSpace(VideoId)) return new Uri($"https://youtube.com/v/{VideoId}");
+
+                if (!string.IsNullOrWhiteSpace(PlaylistId)) return new Uri($"https://youtube.com/playlist?list={PlaylistId}");
 
                 return !string.IsNullOrWhiteSpace(UserId) ? new Uri($"https://youtube.com/u/{UserId}") : null;
             }
@@ -104,14 +108,16 @@ namespace YouTubeLinkParser
 
             var channelId = Parsers.GetChannelId(pathComponents, domain == "youtu.be" || domain == "www.youtu.be");
             var userId = Parsers.GetUserId(pathComponents, queryString);
-            var videoId = Parsers.GetVideoId(pathComponents, queryString, domain == "youtu.be" || domain == "www.youtu.be");
+            var videoId = Parsers.GetVideoId(pathComponents, queryString, domain == "youtu.be" || domain == "www.youtu.be", parsedYouTubeLink.Fragment);
+            var playlistId = Parsers.GetPlaylistId(queryString);
 
             if (!string.IsNullOrWhiteSpace(channelId) || !string.IsNullOrWhiteSpace(videoId) ||
-                !string.IsNullOrWhiteSpace(userId))
+                !string.IsNullOrWhiteSpace(userId) || !string.IsNullOrWhiteSpace(playlistId))
             {
                 youtubeUri.ChannelId = channelId;
                 youtubeUri.VideoId = videoId;
                 youtubeUri.UserId = userId;
+                youtubeUri.PlaylistId = playlistId;
                 return true;
             }
 
