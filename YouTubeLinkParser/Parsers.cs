@@ -213,14 +213,14 @@ namespace YouTubeLinkParser
                 if (!fragment.StartsWith("#p/a/u/") && !fragment.StartsWith("#p/u/")) return videoId;
                 
                 var fragmentVideoId = fragment.Split(@"/").LastOrDefault();
-                if (fragmentVideoId != null) fragmentVideoId = fragmentVideoId.Split("?").FirstOrDefault();
+                fragmentVideoId = fragmentVideoId?.Split("?").FirstOrDefault();
                 if (!string.IsNullOrWhiteSpace(fragmentVideoId)) videoId = fragmentVideoId;
             }
 
             return CleanVideoId(videoId);
         }
 
-        private static string? CleanVideoId(string videoId)
+        private static string? CleanVideoId(string? videoId)
         {
             // if the video ID contains a URL-encoded slash (or a regular slash) YouTube will just parse the first part
             videoId = HttpUtility.UrlDecode(videoId);
