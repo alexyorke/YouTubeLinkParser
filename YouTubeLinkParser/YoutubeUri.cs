@@ -7,15 +7,16 @@ namespace YouTubeLinkParser
 {
     public class YoutubeUri
     {
-        // ReSharper disable once MemberCanBePrivate.Global
-        public YoutubeUri()
+        /// <summary>
+        /// Parses a YouTube URI, and throws a FormatException if the URL is invalid or does not contain any information.
+        /// </summary>
+        /// <param name="url">The URL to parse</param>
+        /// <param name="shouldIgnoreDomain">Whether the domain should be ignored while parsing. This is useful if YouTube adds more domains after
+        /// this has been published or when using services which mimic YouTube's URL pattern for compatibility.</param>
+        public YoutubeUri(string url, bool shouldIgnoreDomain = false)
         {
-        }
-
-        public YoutubeUri(string url)
-        {
-            if (!TryCreate(url, out var uri))
-                throw new FormatException("The channel id, user, or video id were not found.");
+            if (!TryCreate(url, out var uri, shouldIgnoreDomain))
+                throw new FormatException("The channel id, user, playlist id, or video id were not found.");
 
             ChannelId = uri?.ChannelId;
             VideoId = uri?.VideoId;
@@ -23,23 +24,32 @@ namespace YouTubeLinkParser
             PlaylistId = uri?.PlaylistId;
         }
 
+        private YoutubeUri()
+        {
+        }
+
         public string? ChannelId { get; private set; }
         public string? UserId { get; private set; }
         public string? VideoId { get; private set; }
         public string? PlaylistId { get; private set; }
 
+        /// <summary>
+        /// Returns the normalized Uri of the YouTube link but only supports a single attribute in this order:
+        /// channel id, video id, playlist id, or user id. If none are set this returns null.
+        /// </summary>
         public Uri? Uri
         {
             get
             {
-                if (!string.IsNullOrWhiteSpace(ChannelId)) return new Uri($"https://youtube.com/c/{ChannelId}");
+                if (!string.IsNullOrWhiteSpace(ChannelId)) return new Uri($"https://youtube.com/c/{HttpUtility.UrlEncode(ChannelId)}");
 
                 if (!string.IsNullOrWhiteSpace(VideoId)) return new Uri($"https://youtube.com/v/{VideoId}");
 
                 if (!string.IsNullOrWhiteSpace(PlaylistId))
                     return new Uri($"https://youtube.com/playlist?list={PlaylistId}");
 
-                return !string.IsNullOrWhiteSpace(UserId) ? new Uri($"https://youtube.com/u/{UserId}") : null;
+                return !string.IsNullOrWhiteSpace(UserId) ? new Uri(
+                    $"https://youtube.com/u/{HttpUtility.UrlEncode(UserId)}") : null;
             }
         }
 
@@ -201,7 +211,7 @@ namespace YouTubeLinkParser
         /// <param name="unparsedYouTubeUri">The unparsed YouTube URL.</param>
         /// <param name="youtubeUri">The parsed YouTube URL, otherwise null if it could not be parsed.</param>
         /// <returns>Whether the URL could be parsed.</returns>
-        public static bool TryCreate(string unparsedYouTubeUri, out YoutubeUri? youtubeUri)
+        public static bool TryCreate(string unparsedYouTubeUri, out YoutubeUri? youtubeUri, bool shouldIgnoreDomain = false)
         {
             youtubeUri = new YoutubeUri();
 
@@ -223,7 +233,7 @@ namespace YouTubeLinkParser
 
             var domain = Services.GetDomainPart(parsedYouTubeLink.ToString());
 
-            if (!ValidHosts.Contains(domain))
+            if (!ValidHosts.Contains(domain) && !shouldIgnoreDomain)
             {
                 youtubeUri = null;
                 return false;

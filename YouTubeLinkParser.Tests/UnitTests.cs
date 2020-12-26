@@ -368,6 +368,13 @@ namespace YouTubeLinkParser.Tests
         }
 
         [Fact]
+        public void IgnoreDomain()
+        {
+            var expected = "i_GFalTRHDA";
+            Assert.Equal(expected, new YoutubeUri("https://example.com/watch?v=i_GFalTRHDA", true).VideoId);
+        }
+
+        [Fact]
         public void CreateInvalidUrl()
         {
             Assert.Throws<FormatException>(() => new YoutubeUri("https://google.com/"));
