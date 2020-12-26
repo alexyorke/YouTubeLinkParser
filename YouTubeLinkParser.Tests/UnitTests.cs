@@ -104,7 +104,7 @@ namespace YouTubeLinkParser.Tests
             "koirusuker", "", "")]
         [InlineData(
             "https://www.youtube.com/user/patb71210https://www.youtube.com/user/patb71210https://www.youtube.com/", "",
-            "", "", "")]
+            "patb71210", "", "")]
         [InlineData(
             "https://www.youtube.com/watch?v=8A-330Woido&lc=z23bi3oyjyfrcnrz004t1aokgkfgocgndnrykcwole2ebk0h00410", "",
             "", "8A-330Woido", "")]
@@ -311,6 +311,10 @@ namespace YouTubeLinkParser.Tests
         [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRm|xyz", "", "", "J6MpBhzbRm", "")]
         [InlineData("http://www.youtube.com/user/ChakalXGamerhttp://", "", "ChakalXGamer", "", "")]
         [InlineData("https://youtu.be/tXT9Uh42dqk/Yo", "", "", "tXT9Uh42dqk", "")]
+        [InlineData("http://www.youtube.com/watch_popup?v=8WATgU5PduE&feature=youtu.be", "", "", "8WATgU5PduE", "")]
+        [InlineData("http://www.youtube.com/#!/UCx3hvDAnx0mz452ssiUfV1Q", "UCx3hvDAnx0mz452ssiUfV1Q", "", "", "")]
+        [InlineData("https://www.youtube.com/user/berube1297https://www.instagram.com/abcdef/", "", "berube1297", "", "")]
+        [InlineData("https://youtu.be/addme/cFaHNoUZ3pVsG4MTfBNjKwBmOvzxtw", "", "cFaHNoUZ3pVsG4MTfBNjKwBmOvzxtw", "", "")]
         public void TryParseValidUri(string url, string channelId, string userId, string videoId, string playlistId)
         {
             YoutubeUri.TryCreate(url, out var actual);

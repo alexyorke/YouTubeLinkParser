@@ -88,6 +88,10 @@ namespace YouTubeLinkParser
                     {
                         channelId = fragment.Split(@"#/channel/").LastOrDefault().Split("?").FirstOrDefault().Split("&").FirstOrDefault();
                     }
+                    else if (Regex.IsMatch(fragment, @"#!/([a-zA-Z0-9])"))
+                    {
+                        channelId = fragment.Split(@"#!/").LastOrDefault().Split("?").FirstOrDefault().Split("&").FirstOrDefault();
+                    }
 
                     break;
                 }
@@ -111,6 +115,7 @@ namespace YouTubeLinkParser
             {
                 case "u":
                 case "user":
+                case "addme":
                 {
                     if (pathComponents.Count >= 2) username = HttpUtility.UrlDecode(pathComponents[1]);
 
@@ -140,7 +145,7 @@ namespace YouTubeLinkParser
                 }
             }
 
-            if (username.Contains(":") && !username.Contains("http:"))
+            if (username.Contains(":") && !username.Contains("http:") && !username.Contains("https:"))
                 return null;
             
             username = username.Split("http://").FirstOrDefault() ?? "";
@@ -182,6 +187,7 @@ namespace YouTubeLinkParser
             switch (pathComponents.FirstOrDefault())
             {
                 case "watch":
+                case "watch_popup":
                 case "ytscreeningroom":
                 {
                     if (!string.IsNullOrWhiteSpace(queryString.Get("v")))
