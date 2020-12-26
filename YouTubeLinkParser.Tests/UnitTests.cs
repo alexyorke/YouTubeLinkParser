@@ -153,7 +153,7 @@ namespace YouTubeLinkParser.Tests
         [InlineData("https://m.youtube.com/results?q=%E7%A0%94%E7%A3%A8%E5%B8%AB&sm=1", "", "", "", "")]
         [InlineData("https://m.youtube.com/#/user/houstonhiphopfix?sub_confirmation=1", "", "houstonhiphopfix", "", "")]
         [InlineData("http://m.youtube.com/?reload=7&rdm=x9zii2sx#/watch?v=6DWquqxi058", "", "",
-            "", "")] // loads to youtube.com on a desktop browser (not the video)
+            "6DWquqxi058", "")]
         [InlineData("http://m.youtube.com/user/MrGameFox?gl=JP&hl=ja&client=mv-google", "", "MrGameFox", "", "")]
         [InlineData("http://m.youtube.com/watch?feature=player_embedded&v=FstzJLi555c", "", "", "FstzJLi555c", "")]
         [InlineData("http://m.youtube.com/watch?list=PL4054DFC93AC75A3A&v=iyBQQ7oQBmo", "", "", "iyBQQ7oQBmo", "PL4054DFC93AC75A3A")]
