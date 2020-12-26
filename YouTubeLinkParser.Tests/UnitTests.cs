@@ -225,7 +225,7 @@ namespace YouTubeLinkParser.Tests
         [InlineData("http://www.youtube.com/attribution_link?u=%2Fwatch%3Fv%3D", "", "", "", "")]
         [InlineData("http://www.youtube.com/watch?v=u8nQa1cJyX8&a=GxdCwVVULXctT2lYDEPllDR0LRTutYfW", "", "", "u8nQa1cJyX8", "")]
         [InlineData("http://www.youtube.com/watch?v=u8nQa1cJyX8", "", "", "u8nQa1cJyX8", "")]
-        [InlineData("//www.youtube-nocookie.com/embed/up_lNV-yoK4?rel=0", "", "", "up_lNV-yoK4", "")]
+        [InlineData(@"//www.youtube-nocookie.com/embed/up_lNV-yoK4?rel=0", "", "", @"up_lNV-yoK4", "")]
         [InlineData("http://www.youtube.com/user/Scobleizer#p/u/1/1p3vcRhsYGo", "", "Scobleizer", "1p3vcRhsYGo", "")]
         [InlineData("http://www.youtube.com/user/SilkRoadTheatre#p/a/u/2/6dwqZw0j_jY", "", "SilkRoadTheatre", "6dwqZw0j_jY", "")]
         [InlineData("http://youtu.be/6dwqZw0j_jY", "", "", "6dwqZw0j_jY", "")]
