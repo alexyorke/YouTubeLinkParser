@@ -7,10 +7,10 @@ namespace YouTubeLinkParser
 {
     public class YoutubeUri
     {
-        public string? ChannelId;
-        public string? UserId;
-        public string? VideoId;
-        public string? PlaylistId;
+        public string? ChannelId { get; private set; }
+        public string? UserId { get; private set; }
+        public string? VideoId { get; private set; }
+        public string? PlaylistId { get; private set; }
 
         // ReSharper disable once MemberCanBePrivate.Global
         public YoutubeUri()
@@ -74,7 +74,7 @@ namespace YouTubeLinkParser
 
             var domain = Services.GetDomainPart(parsedYouTubeLink.ToString());
 
-            if (!ValidHosts.Contains(domain, StringComparer.InvariantCultureIgnoreCase))
+            if (!ValidHosts.Contains(domain))
             {
                 youtubeUri = null;
                 return false;
@@ -155,7 +155,7 @@ namespace YouTubeLinkParser
                 validHosts.AddRange(tlds.Where(tld => !tld.Contains(".")).Select(tld => $"{tld}.youtube.com"));
                 validHosts.AddRange(tlds.Select(tld => $"m.youtube.{tld}"));
                 validHosts.AddRange(tlds.Select(tld => $"www.youtube.{tld}"));
-                return new HashSet<string>(validHosts);
+                return new HashSet<string>(validHosts, StringComparer.OrdinalIgnoreCase);
             }
         }
 
@@ -165,6 +165,7 @@ namespace YouTubeLinkParser
 
         public override int GetHashCode()
         {
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
             return $"{VideoId ?? "<none>"}-{ChannelId ?? "<none>"}-{UserId ?? "<none>"}".GetHashCode();
         }
 

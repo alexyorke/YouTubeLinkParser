@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -86,11 +84,11 @@ namespace YouTubeLinkParser
                     }
                     else if (Regex.IsMatch(fragment, @"#/channel/([a-zA-Z0-9])"))
                     {
-                        channelId = fragment.Split(@"#/channel/").LastOrDefault().Split("?").FirstOrDefault().Split("&").FirstOrDefault();
+                        channelId = fragment.Split(@"#/channel/").LastOrDefault()?.Split("?").FirstOrDefault()?.Split("&").FirstOrDefault();
                     }
                     else if (Regex.IsMatch(fragment, @"#!/([a-zA-Z0-9])"))
                     {
-                        channelId = fragment.Split(@"#!/").LastOrDefault().Split("?").FirstOrDefault().Split("&").FirstOrDefault();
+                        channelId = fragment.Split(@"#!/").LastOrDefault()?.Split("?").FirstOrDefault()?.Split("&").FirstOrDefault();
                     }
 
                     break;
@@ -140,7 +138,7 @@ namespace YouTubeLinkParser
                 default:
                 {
                     if (!Regex.IsMatch(fragment, @"#/user/([a-zA-Z0-9])")) return null;
-                    username = fragment.Split(@"#/user/").LastOrDefault().Split("?").FirstOrDefault().Split("&").FirstOrDefault() ?? string.Empty;
+                    username = fragment.Split(@"#/user/").LastOrDefault()?.Split("?").FirstOrDefault()?.Split("&").FirstOrDefault() ?? string.Empty;
                     break;
                 }
             }
