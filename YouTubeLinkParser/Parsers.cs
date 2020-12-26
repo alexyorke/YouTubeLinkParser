@@ -303,12 +303,14 @@ namespace YouTubeLinkParser
 
             // YouTube will remove all characters after a video id until it matches one in its database. This is a crude approximation because
             // it is impossible to match exactly as we'd need to know every video in YouTube's database.
-            return !Regex.IsMatch(videoId ?? string.Empty,
-                @"^[a-zA-Z0-9_-]{8,14}$")
+            videoId = Regex.Split(videoId ?? string.Empty,
+                    "[^a-zA-Z0-9_-]")
+                .FirstOrDefault() ?? "";
+            
+            return !Regex.IsMatch(videoId,
+                @"^[a-zA-Z0-9_-]{8,}$")
                 ? null
-                : Regex.Split(videoId,
-                        "[^a-zA-Z0-9_-]")
-                    .First();
+                : videoId;
         }
     }
 }
