@@ -18,10 +18,10 @@ namespace YouTubeLinkParser
                 case "c":
                 case "channel":
                 case "feed":
-                {
-                    if (pathComponents.Count >= 2) channelId = pathComponents[1];
-                    break;
-                }
+                    {
+                        if (pathComponents.Count >= 2) channelId = pathComponents[1];
+                        break;
+                    }
 
                 case "comment":
                 case "get_video":
@@ -66,8 +66,16 @@ namespace YouTubeLinkParser
                 case "my_account":
                 case "playlist":
                 case "ytscreeningroom":
+                {
+                    break;
+                }
                 case "attribution_link":
                 {
+                    if (!string.IsNullOrWhiteSpace(queryString.Get("u")))
+                    {
+                        channelId = queryString.Get("u").Split("/channel/").LastOrDefault() ?? "";
+                        if (channelId.StartsWith("/watch?v=") || channelId.StartsWith("/v/")) channelId = "";
+                    }
                     break;
                 }
                 default:

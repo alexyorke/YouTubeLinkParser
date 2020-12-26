@@ -306,11 +306,11 @@ namespace YouTubeLinkParser.Tests
         [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRmI?_confirmation=1", "", "", "J6MpBhzbRmI", "")]
         [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRmI?_confirmation=1", "", "", "J6MpBhzbRmI", "")]
         [InlineData("\"https://www.youtube.com/watch?v=J6MpBhzbRmI\"", "", "", "J6MpBhzbRmI", "")]
-        [InlineData("'https://www.youtube.com/watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRmI", "")]
-        [InlineData("'https://www.youtube.com./watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRmI", "")]
-        [InlineData("'https://www.youtube.com.br./watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRmI", "")]
-        [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRmhttps://example.com", "", "", "J6MpBhzbRmI", "")]
-        [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRm|xyz", "", "", "J6MpBhzbRmI", "")]
+        [InlineData("'https://www.youtube.com/watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRm", "")]
+        [InlineData("'https://www.youtube.com./watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRm", "")]
+        [InlineData("'https://www.youtube.com.br./watch?v=J6MpBhzbRm'", "", "", "J6MpBhzbRm", "")]
+        [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRmhttps://example.com", "", "", "J6MpBhzbRm", "")]
+        [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRm|xyz", "", "", "J6MpBhzbRm", "")]
         public void TryParseValidUri(string url, string channelId, string userId, string videoId, string playlistId)
         {
             YoutubeUri.TryCreate(url, out var actual);

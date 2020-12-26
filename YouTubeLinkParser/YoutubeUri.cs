@@ -125,7 +125,7 @@ namespace YouTubeLinkParser
             return false;
         }
 
-        private static List<string> ValidHosts
+        private static HashSet<string> ValidHosts
         {
             get
             {
@@ -151,10 +151,11 @@ namespace YouTubeLinkParser
                     ).Split(" ").ToList();
 
                 validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}"));
+                validHosts.AddRange(tlds.Select(tld => $"youtube.{tld}."));
                 validHosts.AddRange(tlds.Where(tld => !tld.Contains(".")).Select(tld => $"{tld}.youtube.com"));
                 validHosts.AddRange(tlds.Select(tld => $"m.youtube.{tld}"));
                 validHosts.AddRange(tlds.Select(tld => $"www.youtube.{tld}"));
-                return validHosts;
+                return new HashSet<string>(validHosts);
             }
         }
 
