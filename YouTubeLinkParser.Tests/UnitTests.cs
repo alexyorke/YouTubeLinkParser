@@ -343,6 +343,7 @@ namespace YouTubeLinkParser.Tests
         [InlineData("https://www.youtube.com/watch?v=J6MpBhzbRm|xyz", "", "", "J6MpBhzbRm", "")]
         [InlineData("http://www.youtube.com/user/ChakalXGamerhttp://", "", "ChakalXGamer", "", "")]
         [InlineData("https://youtu.be/tXT9Uh42dqk/Yo", "", "", "tXT9Uh42dqk", "")]
+        [InlineData("https://youtu.be:8080/tXT9Uh42dqk/Yo", "", "", "tXT9Uh42dqk", "")]
         [InlineData("http://www.youtube.com/watch_popup?v=8WATgU5PduE&feature=youtu.be", "", "", "8WATgU5PduE", "")]
         [InlineData("http://www.youtube.com/#!/UCx3hvDAnx0mz452ssiUfV1Q", "UCx3hvDAnx0mz452ssiUfV1Q", "", "", "")]
         [InlineData("https://www.youtube.com/user/berube1297https://www.instagram.com/abcdef/", "", "berube1297", "",
