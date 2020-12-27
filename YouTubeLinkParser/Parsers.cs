@@ -73,8 +73,8 @@ namespace YouTubeLinkParser
                 {
                     if (!string.IsNullOrWhiteSpace(queryString.Get("u")))
                     {
-                        channelId = queryString.Get("u").Split("/channel/").LastOrDefault() ?? "";
-                        if (channelId.StartsWith("/watch?v=") || channelId.StartsWith("/v/")) channelId = "";
+                        channelId = queryString.Get("u").Split("/channel/").LastOrDefault() ?? string.Empty;
+                        if (channelId.StartsWith("/watch?v=") || channelId.StartsWith("/v/")) channelId = string.Empty;
                     }
 
                     break;
@@ -94,11 +94,11 @@ namespace YouTubeLinkParser
                 }
             }
 
-            channelId = HttpUtility.UrlDecode(channelId ?? "");
-            channelId = channelId.Split("?").FirstOrDefault() ?? "";
+            channelId = HttpUtility.UrlDecode(channelId ?? string.Empty);
+            channelId = channelId.Split("?").FirstOrDefault() ?? string.Empty;
 
-            channelId = channelId.Split("http://").FirstOrDefault() ?? "";
-            channelId = channelId.Split("https://").FirstOrDefault() ?? "";
+            channelId = channelId.Split("http://").FirstOrDefault() ?? string.Empty;
+            channelId = channelId.Split("https://").FirstOrDefault() ?? string.Empty;
 
             return Regex.IsMatch(HttpUtility.UrlEncode(Services.RemoveDiacritics(channelId)), @"[a-zA-Z0-9\-_\%\+]{1,}")
                 ? channelId
@@ -108,7 +108,7 @@ namespace YouTubeLinkParser
         internal static string? GetUserId(IReadOnlyList<string> pathComponents, NameValueCollection queryString,
             string fragment)
         {
-            string username = "";
+            string username = string.Empty;
             switch (pathComponents.FirstOrDefault())
             {
                 case "u":
@@ -147,11 +147,11 @@ namespace YouTubeLinkParser
             if (username.Contains(":") && !username.Contains("http:") && !username.Contains("https:"))
                 return null;
 
-            username = username.Split("http://").FirstOrDefault() ?? "";
-            username = username.Split("http:").FirstOrDefault() ?? "";
+            username = username.Split("http://").FirstOrDefault() ?? string.Empty;
+            username = username.Split("http:").FirstOrDefault() ?? string.Empty;
 
-            username = username.Split("https://").FirstOrDefault() ?? "";
-            username = username.Split("https:").FirstOrDefault() ?? "";
+            username = username.Split("https://").FirstOrDefault() ?? string.Empty;
+            username = username.Split("https:").FirstOrDefault() ?? string.Empty;
             return username;
         }
 
@@ -203,7 +203,7 @@ namespace YouTubeLinkParser
                 case "e":
                 {
                     if (pathComponents.Count >= 2 && !string.IsNullOrWhiteSpace(pathComponents[1]))
-                        videoId = pathComponents[1].Split("&").FirstOrDefault() ?? "";
+                        videoId = pathComponents[1].Split("&").FirstOrDefault() ?? string.Empty;
 
                     break;
                 }
@@ -233,7 +233,7 @@ namespace YouTubeLinkParser
                     {
                         var user = queryString.Get("u");
 
-                        videoId = HttpUtility.ParseQueryString(user.Split("?").LastOrDefault() ?? "").Get("v");
+                        videoId = HttpUtility.ParseQueryString(user.Split("?").LastOrDefault() ?? string.Empty).Get("v");
                     }
                     else if (Regex.IsMatch(queryString.ToString() ?? string.Empty, @"\/watch\?v=[a-zA-Z0-9_-]{8,14}$"))
                     {
@@ -298,10 +298,10 @@ namespace YouTubeLinkParser
             // if the video ID contains a URL-encoded slash (or a regular slash) YouTube will just parse the first part
             videoId = HttpUtility.UrlDecode(videoId);
 
-            videoId = videoId.Split("http://").FirstOrDefault() ?? "";
-            videoId = videoId.Split("https://").FirstOrDefault() ?? "";
+            videoId = videoId.Split("http://").FirstOrDefault() ?? string.Empty;
+            videoId = videoId.Split("https://").FirstOrDefault() ?? string.Empty;
 
-            videoId = videoId.Split("?").FirstOrDefault() ?? "";
+            videoId = videoId.Split("?").FirstOrDefault() ?? string.Empty;
 
             if (videoId.Contains("/")) videoId = videoId.Split("/").First();
 
@@ -309,7 +309,7 @@ namespace YouTubeLinkParser
             // it is impossible to match exactly as we'd need to know every video in YouTube's database.
             videoId = Regex.Split(videoId ?? string.Empty,
                     "[^a-zA-Z0-9_-]")
-                .FirstOrDefault() ?? "";
+                .FirstOrDefault() ?? string.Empty;
 
             return !Regex.IsMatch(videoId,
                 @"^[a-zA-Z0-9_-]{8,}$")
