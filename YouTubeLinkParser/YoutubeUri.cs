@@ -248,6 +248,7 @@ namespace YouTubeLinkParser
             youtubeUri = new YoutubeUri();
 
             unparsedYouTubeUri = unparsedYouTubeUri.Trim().Trim('\'').Trim('\"');
+            unparsedYouTubeUri = new string(unparsedYouTubeUri.Where(c => !char.IsControl(c) || c == ' ').ToArray());
 
             // Uri.TryCreate requires that the URL has a protocol
             var httpPrefixedUnparsedYouTubeLink = unparsedYouTubeUri;
