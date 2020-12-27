@@ -271,9 +271,11 @@ namespace YouTubeLinkParser
                 return false;
             }
 
+            var isShortUrl = domain == "youtu.be" || domain == "www.youtu.be" || domain == "www.yt.be" || domain == "yt.be";
+
             // TODO: check URLs with commas in them to make sure this doesn't throw any exceptions
             // YouTube ignores everything before the comma in a URL, sometimes...
-            if (domain == "youtu.be" && unparsedYouTubeUri.Contains(","))
+            if (isShortUrl && unparsedYouTubeUri.Contains(","))
                 parsedYouTubeLink = new Uri(unparsedYouTubeUri.Split(",").Last());
 
             List<string> pathComponents;
@@ -297,7 +299,6 @@ namespace YouTubeLinkParser
 
             var queryString = HttpUtility.ParseQueryString(parsedYouTubeLink.Query);
 
-            var isShortUrl = domain == "youtu.be" || domain == "www.youtu.be" || domain == "www.yt.be" || domain == "yt.be";
             var channelId = Parsers.GetChannelId(pathComponents, queryString,
                 isShortUrl, parsedYouTubeLink.Fragment);
             var userId = Parsers.GetUserId(pathComponents, queryString, parsedYouTubeLink.Fragment);
