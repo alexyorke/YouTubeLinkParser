@@ -157,6 +157,11 @@ namespace YouTubeLinkParser
 
         internal static string? GetPlaylistId(NameValueCollection queryString, string fragment)
         {
+            if (!string.IsNullOrWhiteSpace(queryString.Get("p")))
+            {
+                return queryString.Get("p");
+            }
+            
             if (string.IsNullOrWhiteSpace(queryString.Get("list")))
             {
                 if (!fragment.StartsWith("#")) return null;

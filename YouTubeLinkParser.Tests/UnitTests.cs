@@ -350,6 +350,10 @@ namespace YouTubeLinkParser.Tests
             "")]
         [InlineData("https://youtu.be/addme/cFaHNoUZ3pVsG4MTfBNjKwBmOvzxtw", "", "cFaHNoUZ3pVsG4MTfBNjKwBmOvzxtw", "",
             "")]
+        [InlineData("https://www.youtube.com/playlist?p=PLB66D7ED343F8246F", "", "", "",
+            "PLB66D7ED343F8246F")]
+        [InlineData("https://youtu.be/NXnHB5DMiBs,https://www.facebook.com/abcdefgh", "", "", "NXnHB5DMiBs",
+            "")]
         public void TryParseValidUri(string url, string channelId, string userId, string videoId, string playlistId)
         {
             YoutubeUri.TryCreate(url, out var actual);

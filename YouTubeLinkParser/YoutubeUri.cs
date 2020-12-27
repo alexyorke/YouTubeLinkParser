@@ -66,10 +66,12 @@ namespace YouTubeLinkParser
                 {
                     "gaming.youtube.com",
                     "music.youtube.com",
+                    "studio.youtube.com",
                     "tv.youtube.com",
                     "youtu.be",
                     "yt.be",
                     "youtube",
+                    "m.youtube",
                     "youtube-nocookie.com",
                     "youtube.googleapis.com",
                     "youtubekids.com"
@@ -270,28 +272,40 @@ namespace YouTubeLinkParser
             }
 
             // remove port (if it exists)
-            parsedYouTubeLink = new Uri(parsedYouTubeLink.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
+            if (!UriIsValidYouTubeDomain(parsedYouTubeLink) && !shouldIgnoreDomain) return false;
             var domain = Services.GetDomainPart(parsedYouTubeLink.ToString());
-
-            if (!ValidHosts.Contains(domain) && !shouldIgnoreDomain)
-            {
-                youtubeUri = null;
-                return false;
-            }
-
             var isShortUrl = domain == "youtu.be" || domain == "www.youtu.be" || domain == "www.yt.be" || domain == "yt.be";
 
             // TODO: check URLs with commas in them to make sure this doesn't throw any exceptions
             // YouTube ignores everything before the comma in a URL, sometimes...
             if (isShortUrl && unparsedYouTubeUri.Contains(","))
             {
-                if (Uri.TryCreate(unparsedYouTubeUri.Split(",").Last(), UriKind.Absolute, out var newUrl)) {
-                    parsedYouTubeLink = newUrl;
-                } else
+                // if both are valid YouTube domains, choose the last one otherwise choose the first
+                var splitUris = unparsedYouTubeUri.Split(",");
+                
+                // I don't know the behavior for more than two comas in a URI yet
+                if (splitUris.Length > 2)
                 {
                     youtubeUri = null;
                     return false;
                 }
+
+                var chosenUri = "";
+                Uri.TryCreate(splitUris.First(), UriKind.Absolute, out var firstUri);
+                Uri.TryCreate(splitUris.Last(), UriKind.Absolute, out var lastUri);
+
+                if (firstUri != null && UriIsValidYouTubeDomain(firstUri))
+                {
+                    chosenUri = (lastUri != null && UriIsValidYouTubeDomain(lastUri)) ? splitUris.Last() : splitUris.First();
+                }
+
+                if (!Uri.TryCreate(chosenUri, UriKind.Absolute, out var newUrl))
+                {
+                    youtubeUri = null;
+                    return false;
+                }
+
+                parsedYouTubeLink = newUrl;
             }
 
             List<string> pathComponents;
@@ -338,6 +352,16 @@ namespace YouTubeLinkParser
             youtubeUri = null;
             return false;
         }
+
+        private static bool UriIsValidYouTubeDomain(Uri parsedYouTubeLink)
+        {
+            parsedYouTubeLink =
+                new Uri(parsedYouTubeLink.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
+            var domain = Services.GetDomainPart(parsedYouTubeLink.ToString());
+
+            return ValidHosts.Contains(domain);
+        }
+
 
         public override bool Equals(object? obj)
         {

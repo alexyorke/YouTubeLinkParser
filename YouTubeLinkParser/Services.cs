@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace YouTubeLinkParser
@@ -17,6 +18,7 @@ namespace YouTubeLinkParser
             var trimmed = url.Substring(start, end - start);
             if (trimmed.StartsWith("www."))
                 trimmed = trimmed.Substring("www.".Length);
+            trimmed = trimmed.Split(":").First();
             return trimmed;
         }
 
