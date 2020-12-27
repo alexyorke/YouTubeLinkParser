@@ -279,7 +279,15 @@ namespace YouTubeLinkParser
             // TODO: check URLs with commas in them to make sure this doesn't throw any exceptions
             // YouTube ignores everything before the comma in a URL, sometimes...
             if (isShortUrl && unparsedYouTubeUri.Contains(","))
-                parsedYouTubeLink = new Uri(unparsedYouTubeUri.Split(",").Last());
+            {
+                if (Uri.TryCreate(unparsedYouTubeUri.Split(",").Last(), UriKind.Absolute, out var newUrl)) {
+                    parsedYouTubeLink = newUrl;
+                } else
+                {
+                    youtubeUri = null;
+                    return false;
+                }
+            }
 
             List<string> pathComponents;
 
