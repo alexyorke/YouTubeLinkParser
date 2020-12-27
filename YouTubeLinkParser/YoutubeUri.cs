@@ -263,6 +263,8 @@ namespace YouTubeLinkParser
                 return false;
             }
 
+            // remove port (if it exists)
+            parsedYouTubeLink = new Uri(parsedYouTubeLink.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
             var domain = Services.GetDomainPart(parsedYouTubeLink.ToString());
 
             if (!ValidHosts.Contains(domain) && !shouldIgnoreDomain)
