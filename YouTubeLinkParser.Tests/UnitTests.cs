@@ -380,5 +380,18 @@ namespace YouTubeLinkParser.Tests
         {
             Assert.Throws<FormatException>(() => new YoutubeUri("https://google.com/"));
         }
+
+        [Theory]
+        [InlineData("https://www.youtube.com/results?search_query=jb+production+74", "jb production 74")]
+        [InlineData("https://www.youtube.com/results?search_query=john+florence+dela+pena&sp=6gMA", "john florence dela pena")]
+        [InlineData("https://www.youtube.com/results?search_query=%E6%B8%A9%E7%9B%B8%E8%AF%B4%E5%85%9A%E5%8F%B2", "温相说党史")]
+        [InlineData("https://m.youtube.com/results?q=Bumblebee-3_3", "Bumblebee-3_3")]
+        [InlineData("https://m.youtube.com/?#/results?q=minecraft%20gaming%20and%20other%20gaming%2012345&sm=1", "minecraft gaming and other gaming 12345")]
+        [InlineData("https://m.youtube.com/#/results?q=thecoffeeclub&search_type=search_users&uploaded=", "thecoffeeclub")]
+        [InlineData("http://youtube.com/results?gl=NG&client=mv-google&hl=en-GB&q=ajao+filmhead&submit=Search", "ajao filmhead")]
+        public void SearchResults(string url, string result)
+        {
+            Assert.Equal(result, new YoutubeUri(url).SearchResults);
+        }
     }
 }

@@ -175,6 +175,21 @@ namespace YouTubeLinkParser
             return null;
         }
 
+        internal static string? GetSearchResults(NameValueCollection queryString, string fragment)
+        {
+            if (!string.IsNullOrWhiteSpace(queryString.Get("search_query")))
+            {
+                return queryString.Get("search_query");
+            }
+            
+            if (!string.IsNullOrWhiteSpace(queryString.Get("q")))
+            {
+                return queryString.Get("q");
+            }
+
+            return null;
+        }
+
         internal static string? GetVideoId(IReadOnlyList<string> pathComponents, NameValueCollection queryString,
             bool isShortUrl, string fragment)
         {

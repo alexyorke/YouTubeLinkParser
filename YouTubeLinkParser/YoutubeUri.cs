@@ -16,12 +16,13 @@ namespace YouTubeLinkParser
         public YoutubeUri(string url, bool shouldIgnoreDomain = false)
         {
             if (!TryCreate(url, out var uri, shouldIgnoreDomain))
-                throw new FormatException("The channel id, user, playlist id, or video id were not found.");
+                throw new FormatException("The channel id, user, playlist id, search results, or video id were not found.");
 
             ChannelId = uri?.ChannelId;
             VideoId = uri?.VideoId;
             UserId = uri?.UserId;
             PlaylistId = uri?.PlaylistId;
+            SearchResults = uri?.SearchResults;
         }
 
         private YoutubeUri()
@@ -32,10 +33,11 @@ namespace YouTubeLinkParser
         public string? UserId { get; private set; }
         public string? VideoId { get; private set; }
         public string? PlaylistId { get; private set; }
+        public string? SearchResults { get; private set; }
 
         /// <summary>
         /// Returns the normalized Uri of the YouTube link but only supports a single attribute in this order:
-        /// channel id, video id, playlist id, or user id. If none are set this returns null.
+        /// channel id, video id, search result, playlist id, or user id. If none are set this returns null.
         /// </summary>
         public Uri? Uri
         {
@@ -47,6 +49,9 @@ namespace YouTubeLinkParser
 
                 if (!string.IsNullOrWhiteSpace(PlaylistId))
                     return new Uri($"https://youtube.com/playlist?list={PlaylistId}");
+
+                if (!string.IsNullOrWhiteSpace(SearchResults))
+                    return new Uri($"https://youtube.com/results?search_query={HttpUtility.UrlEncode(SearchResults)}");
 
                 return !string.IsNullOrWhiteSpace(UserId) ? new Uri(
                     $"https://youtube.com/u/{HttpUtility.UrlEncode(UserId)}") : null;
@@ -316,14 +321,17 @@ namespace YouTubeLinkParser
             var videoId = Parsers.GetVideoId(pathComponents, queryString,
                 isShortUrl, parsedYouTubeLink.Fragment);
             var playlistId = Parsers.GetPlaylistId(queryString, parsedYouTubeLink.Fragment);
+            var searchResults = Parsers.GetSearchResults(queryString, parsedYouTubeLink.Fragment);
 
             if (!string.IsNullOrWhiteSpace(channelId) || !string.IsNullOrWhiteSpace(videoId) ||
-                !string.IsNullOrWhiteSpace(userId) || !string.IsNullOrWhiteSpace(playlistId))
+                !string.IsNullOrWhiteSpace(userId) || !string.IsNullOrWhiteSpace(playlistId) ||
+                !string.IsNullOrWhiteSpace(searchResults))
             {
                 youtubeUri.ChannelId = channelId;
                 youtubeUri.VideoId = videoId;
                 youtubeUri.UserId = userId;
                 youtubeUri.PlaylistId = playlistId;
+                youtubeUri.SearchResults = searchResults;
                 return true;
             }
 
