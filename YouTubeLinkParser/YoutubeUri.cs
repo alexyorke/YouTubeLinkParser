@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web;
+using UriTemplate.Core;
 
 namespace YouTubeLinkParser
 {
+    public class ParameterizedUriTemplate
+    {
+        public UriTemplate.Core.UriTemplate? UriTemplate;
+        public string Parameter = "";
+    }
     public class YoutubeUri
     {
         /// <summary>
@@ -239,6 +246,14 @@ namespace YouTubeLinkParser
             }
         }
 
+        static Uri ReplaceHost(string original, string newHostName)
+        {
+            var builder = new UriBuilder(original);
+            builder.Host = newHostName;
+            builder.Scheme = "https://";
+            return builder.Uri;
+        }
+
         /// <summary>
         ///     Try to parse a given YouTube URL. Accepts any unparsed YouTube URL which can be opened using any modern desktop
         ///     web-browser,
@@ -254,26 +269,27 @@ namespace YouTubeLinkParser
         {
             youtubeUri = new YoutubeUri();
 
-            unparsedYouTubeUri = unparsedYouTubeUri.Trim().Trim('\'').Trim('\"');
+            unparsedYouTubeUri = unparsedYouTubeUri.Trim('\'', '\"');
             unparsedYouTubeUri = new string(unparsedYouTubeUri.Where(c => !char.IsControl(c) || c == ' ').ToArray());
 
+            var validProtocols = new List<string> {"https://", "http://", "//"};
+
             // Uri.TryCreate requires that the URL has a protocol
-            var httpPrefixedUnparsedYouTubeLink = unparsedYouTubeUri;
-            if (!unparsedYouTubeUri.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase) &&
-                !unparsedYouTubeUri.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase) &&
-                !unparsedYouTubeUri.StartsWith("//"))
-                httpPrefixedUnparsedYouTubeLink = $"https://{unparsedYouTubeUri}";
+            var httpPrefixedUnparsedYouTubeUri = unparsedYouTubeUri;
+            if (validProtocols.TrueForAll(protocol =>
+                !unparsedYouTubeUri.StartsWith(protocol, StringComparison.InvariantCultureIgnoreCase)))
+                httpPrefixedUnparsedYouTubeUri = $"https://{unparsedYouTubeUri}";
 
             // if it's not a URL there's nothing we can do
-            if (!Uri.TryCreate(httpPrefixedUnparsedYouTubeLink, UriKind.Absolute, out var parsedYouTubeLink))
+            if (!Uri.TryCreate(httpPrefixedUnparsedYouTubeUri, UriKind.Absolute, out var parsedYouTubeUri))
             {
                 youtubeUri = null;
                 return false;
             }
 
             // remove port (if it exists)
-            if (!UriIsValidYouTubeDomain(parsedYouTubeLink) && !shouldIgnoreDomain) return false;
-            var domain = Services.GetDomainPart(parsedYouTubeLink.ToString());
+            if (!UriIsValidYouTubeDomain(parsedYouTubeUri) && !shouldIgnoreDomain) return false;
+            var domain = Services.GetDomainPart(parsedYouTubeUri.ToString());
             var isShortUrl = domain == "youtu.be" || domain == "www.youtu.be" || domain == "www.yt.be" || domain == "yt.be";
 
             // TODO: check URLs with commas in them to make sure this doesn't throw any exceptions
@@ -305,37 +321,106 @@ namespace YouTubeLinkParser
                     return false;
                 }
 
-                parsedYouTubeLink = newUrl;
+                parsedYouTubeUri = newUrl;
             }
 
             List<string> pathComponents;
 
             // TODO: some carefully crafted URLs might cause this to throw an exception when the URL is re-parsed
             // URLs like https://youtube.com/#/...
-            if (parsedYouTubeLink.Fragment.StartsWith("#") || parsedYouTubeLink.Fragment.StartsWith("?#"))
+            if (parsedYouTubeUri.Fragment.StartsWith("#") || parsedYouTubeUri.Fragment.StartsWith("?#"))
             {
                 var parsedYouTubeLinkWithoutFragment =
-                    new Uri(parsedYouTubeLink.ToString().Replace("/#/", "/").Replace("/?#/", "/"));
+                    new Uri(parsedYouTubeUri.ToString().Replace("/#/", "/").Replace("/?#/", "/"));
                 pathComponents = parsedYouTubeLinkWithoutFragment.AbsolutePath
                     .Split("/", StringSplitOptions.RemoveEmptyEntries)
                     .ToList();
-                parsedYouTubeLink = parsedYouTubeLinkWithoutFragment;
+                parsedYouTubeUri = parsedYouTubeLinkWithoutFragment;
             }
             else
             {
-                pathComponents = parsedYouTubeLink.AbsolutePath.Split("/", StringSplitOptions.RemoveEmptyEntries)
+                pathComponents = parsedYouTubeUri.AbsolutePath.Split("/", StringSplitOptions.RemoveEmptyEntries)
                     .ToList();
             }
 
-            var queryString = HttpUtility.ParseQueryString(parsedYouTubeLink.Query);
+            var replaceHost = isShortUrl ? parsedYouTubeUri : ReplaceHost(parsedYouTubeUri.ToString(), "youtube.com");
+            
+            var templates = new List<ParameterizedUriTemplate>
+            {
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("http://youtu.be/{v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}&{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/ytscreeningroom{?v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/ytscreeningroom{?v}&{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?vi}"), Parameter = "vi"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?vi}{&keys*}"), Parameter = "vi"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?/watch{?v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}&{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?keys*}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/e/{v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}?{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}/{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/watch{?v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/watch{?keys*}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/v/{v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/vi/{v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/v/{v}?{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/vi/{v}?{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/channel{/c}"), Parameter = "c"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/channel{/c}{+var}"), Parameter = "c"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/c{/c}"), Parameter = "c"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com{/c}"), Parameter = "c"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{/c}"), Parameter = "c"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{+c}"), Parameter = "c"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/profile{?user}"), Parameter = "user"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/profile{?keys*}"), Parameter = "user"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}#{+var}"), Parameter = "user"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}"), Parameter = "user"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}?{+var}"), Parameter = "user"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}#p/a/u/1/{v}"), Parameter = "user"},
+
+            };
+
+            foreach (var template in templates)
+            {
+                if (template.UriTemplate == null) continue;
+                UriBuilder u1 = new UriBuilder(replaceHost.AbsoluteUri);
+                u1.Port = -1;
+                Uri clean = new Uri(u1.Uri.ToString());
+                var doesTemplateMatch = template.UriTemplate.Match(clean);
+
+                var extracted = GetBindingValueByName(doesTemplateMatch, template.Parameter);
+
+                if (string.IsNullOrWhiteSpace(extracted)) continue;
+                if (template.Parameter == "v")
+                {
+                    youtubeUri.VideoId = extracted.Split("|").FirstOrDefault();
+                } else if (template.Parameter == "c")
+                {
+                    youtubeUri.ChannelId = extracted.Split("|").FirstOrDefault();
+                }
+                else if (template.Parameter == "user")
+                {
+                    youtubeUri.UserId = extracted.Split("|").FirstOrDefault();
+                }
+
+                return true;
+            }
+
+            /*var queryString = HttpUtility.ParseQueryString(parsedYouTubeUri.Query);
 
             var channelId = Parsers.GetChannelId(pathComponents, queryString,
-                isShortUrl, parsedYouTubeLink.Fragment);
-            var userId = Parsers.GetUserId(pathComponents, queryString, parsedYouTubeLink.Fragment);
+                isShortUrl, parsedYouTubeUri.Fragment);
+            var userId = Parsers.GetUserId(pathComponents, queryString, parsedYouTubeUri.Fragment);
             var videoId = Parsers.GetVideoId(pathComponents, queryString,
-                isShortUrl, parsedYouTubeLink.Fragment);
-            var playlistId = Parsers.GetPlaylistId(queryString, parsedYouTubeLink.Fragment);
-            var searchResults = Parsers.GetSearchResults(queryString, parsedYouTubeLink.Fragment);
+                isShortUrl, parsedYouTubeUri.Fragment);
+            var playlistId = Parsers.GetPlaylistId(queryString, parsedYouTubeUri.Fragment);
+            var searchResults = Parsers.GetSearchResults(queryString, parsedYouTubeUri.Fragment);
 
             if (!string.IsNullOrWhiteSpace(channelId) || !string.IsNullOrWhiteSpace(videoId) ||
                 !string.IsNullOrWhiteSpace(userId) || !string.IsNullOrWhiteSpace(playlistId) ||
@@ -347,10 +432,24 @@ namespace YouTubeLinkParser
                 youtubeUri.PlaylistId = playlistId;
                 youtubeUri.SearchResults = searchResults;
                 return true;
-            }
+            }*/
 
             youtubeUri = null;
             return false;
+        }
+
+        private static string? GetBindingValueByName(UriTemplateMatch output2, string param)
+        {
+            if (output2 == null || param == null) return null;
+            var test = output2.Bindings;
+            test.TryGetValue(param, out var test4);
+            test4.Deconstruct(out _, out var val1);
+            if (!(val1 is Dictionary<string, string>))
+            {
+                return val1.ToString();
+            }
+
+            return ((Dictionary<string, string>) val1).TryGetValue(param, out var var2) ? var2 : null;
         }
 
         private static bool UriIsValidYouTubeDomain(Uri parsedYouTubeLink)
