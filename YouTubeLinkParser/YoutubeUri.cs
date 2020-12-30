@@ -10,7 +10,8 @@ namespace YouTubeLinkParser
     public class ParameterizedUriTemplate
     {
         public UriTemplate.Core.UriTemplate? UriTemplate;
-        public string Parameter = "";
+        public List<string> Parameters = new List<string>();
+        public bool SearchKeys { get; set; } = false;
     }
     public class YoutubeUri
     {
@@ -326,95 +327,108 @@ namespace YouTubeLinkParser
 
 
             var replaceHost = isShortUrl ? ReplaceHost(parsedYouTubeUri.ToString(), "youtu.be") : ReplaceHost(parsedYouTubeUri.ToString(), "youtube.com");
-            
+
+
             var templates = new List<ParameterizedUriTemplate>
             {
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/profile{?user}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/profile{?keys*}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/playlist{?list}"), Parameter = "list"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/playlist{?p}"), Parameter = "p"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/playlist{?keys*}"), Parameter = "list"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/playlist{?keys*}"), Parameter = "p"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtu.be/{v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtu.be/{v}{/path}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtu.be/{v}{&keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}#/channel/{c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/?#/channel/{c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/?#/user/{user}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/#/user/{user}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/#/user/{user}{?keys*}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}#/user/{u}"), Parameter = "u"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}#/watch?v={v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}{&keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}{/path}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}#"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}#{+var}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch?v={+v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/subscription_center?add_user={u}"), Parameters = new List<string>{"u"}},
 
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?v}{&keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?v}#"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?v}#{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?/watch{?v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?u=/watch?v={v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link{?keys*}"), Parameters = new List<string>{"u"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?u=/watch?v={v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?u=/watch?v={v}{&keys*}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?a={var}&u=/watch?v={v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?a={var}&u=/watch?v={v}{&keys*}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?u=/watch?v={v}{&keys*}"), Parameters = new List<string>{"v"}},
 
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?vi}{&keys*}"), Parameter = "vi"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?keys*}"), Parameter = "vi"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?vi}#"), Parameter = "vi"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?vi}#{+var}"), Parameter = "vi"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch/{v}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/profile{?user}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/profile{?keys*}"), Parameters = new List<string>{"user"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/playlist{?list}"), Parameters = new List<string>{"list"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/playlist{?p}"), Parameters = new List<string>{"p"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/playlist{?keys*}"), Parameters = new List<string>{"list"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/playlist{?keys*}"), Parameters = new List<string>{"p"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtu.be/{v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtu.be/{v}{/path}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtu.be/{v}{&keys*}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}#/channel/{c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/?#/channel/{c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/?#/user/{user}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/#/user/{user}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/#/user/{user}{?keys*}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}#/user/{u}"), Parameters = new List<string>{"u"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}#/watch?v={v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}{&keys*}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}{/path}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?keys*}"), Parameters = new List<string>{"v"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}#"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}#{+var}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch?v={+v}"), Parameters = new List<string>{"v"}},
 
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/ytscreeningroom{?v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/ytscreeningroom{?v}&{+var}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/{+var}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?vi}"), Parameter = "vi"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?v}{&keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?vi}{&keys*}"), Parameter = "vi"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link{?keys*}"), Parameter = "u"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?/watch{?v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?u=/watch?v={v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/attribution_link?u=/watch?v={v}{&keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}&{+var}"), Parameter = "v"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?v}{&keys*}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?keys*}"), Parameters = new List<string>{"v"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?v}#"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch_popup{?v}#{+var}"), Parameters = new List<string>{"v"}},
+
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?vi}{&keys*}"), Parameters = new List<string>{"vi"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?keys*}"), Parameters = new List<string>{"vi"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?vi}#"), Parameters = new List<string>{"vi"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?vi}#{+var}"), Parameters = new List<string>{"vi"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch/{v}"), Parameters = new List<string>{"v"}},
+
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/ytscreeningroom{?v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/ytscreeningroom{?v}&{+var}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?keys*}"), Parameters = new List<string>{"v"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/{+var}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?vi}"), Parameters = new List<string>{"vi"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?v}{&keys*}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?vi}{&keys*}"), Parameters = new List<string>{"vi"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}"), Parameters = new List<string>{"v"}, SearchKeys = true},
                 
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/e/{v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/watch{?v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}?{+var}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}/{+var}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/watch{?keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/v/{v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/v/{v}{&keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/vi/{v}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/vi/{v}{&keys*}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/v/{v}?{+var}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/vi/{v}?{+var}"), Parameter = "v"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/channel{/c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}#/channel/{c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/channel{/c}{+var}"), Parameter = "c"},
+
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}/"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/watch{?v}&{+var}"), Parameters = new List<string>{"v"}},
+                
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/e/{v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/watch{?v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/watch{?keys*}"), Parameters = new List<string>{"v"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/v={v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}?{+var}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/{v}/{+var}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/embed/watch{?keys*}"), Parameters = new List<string>{"v"}, SearchKeys = true},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/v/{v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/v/{v}{&keys*}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/vi/{v}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/vi/{v}{&keys*}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/v/{v}?{+var}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/vi/{v}?{+var}"), Parameters = new List<string>{"v"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/channel{/c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{?keys*}#/channel/{c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/channel{/c}{+var}"), Parameters = new List<string>{"c"}},
 
 
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}#p/a/u/1/{v}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}#{+var}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}/"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}{+path}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}?{+var}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}{?keys*}"), Parameter = "user"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/feed/{+c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/c{/c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/+{+c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com{/c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com{/c}{/path}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{/c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/#!/{c}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{c}{?keys*}"), Parameter = "c"},
-                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{+c}"), Parameter = "c"},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}#p/a/u/1/{v}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}#p/u/1/{v}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}#{+var}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}/"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}{+path}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}?{+var}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/user/{user}{?keys*}"), Parameters = new List<string>{"user"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/feed/{+c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/c{/c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/+{+c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com{/c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com{/c}{/path}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{/c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/#!/{c}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{c}{?keys*}"), Parameters = new List<string>{"c"}},
+                new ParameterizedUriTemplate {UriTemplate = new UriTemplate.Core.UriTemplate("https://youtube.com/{+c}"), Parameters = new List<string>{"c"}},
 
 
             };
@@ -427,9 +441,12 @@ namespace YouTubeLinkParser
                 Uri clean = new Uri(u1.Uri.ToString());
                 var doesTemplateMatch = template.UriTemplate.Match(clean);
 
-                var extracted = GetBindingValueByName(doesTemplateMatch, template.Parameter);
+                template.Parameters
+                    .Select(parameter => GetBindingValueByName(doesTemplateMatch, parameter, template.SearchKeys))
+                    .TrueForAll(x => !string.IsNullOrWhiteSpace(x));
 
-                if (string.IsNullOrWhiteSpace(extracted)) continue;
+
+
                 switch (template.Parameter)
                 {
                     case "v":
@@ -480,19 +497,34 @@ namespace YouTubeLinkParser
             return false;
         }
 
-        private static string? GetBindingValueByName(UriTemplateMatch output2, string param)
+        private static string? GetBindingValueByName(UriTemplateMatch output2, string param, bool searchKeys = false)
         {
             if (output2 == null || param == null) return null;
             var test = output2.Bindings;
-            test.TryGetValue(param, out var test4);
-            test4.Deconstruct(out _, out var val1);
-            if (val1 == null) return null;
-            if (!(val1 is Dictionary<string, string>))
+            if (searchKeys)
             {
-                return val1.ToString();
-            }
+                test.TryGetValue("keys", out var test4);
+                test4.Deconstruct(out var key, out object val1);
+                if (val1 == null) return null;
+                if (!(val1 is Dictionary<string, string>))
+                {
+                    return val1.ToString();
+                }
 
-            return ((Dictionary<string, string>) val1).TryGetValue(param, out var var2) ? var2 : null;
+                return ((Dictionary<string, string>)val1).TryGetValue(param, out var var2) ? var2 : null;
+            }
+            else
+            {
+                test.TryGetValue(param, out var test4);
+                test4.Deconstruct(out _, out var val1);
+                if (val1 == null) return null;
+                if (!(val1 is Dictionary<string, string>))
+                {
+                    return val1.ToString();
+                }
+
+                return ((Dictionary<string, string>) val1).TryGetValue(param, out var var2) ? var2 : null;
+            }
         }
 
         private static bool UriIsValidYouTubeDomain(Uri parsedYouTubeLink)
