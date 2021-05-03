@@ -5,7 +5,7 @@ using System.Text;
 
 namespace YouTubeLinkParser
 {
-    public static class Services
+    internal static class Services
     {
         public static string GetDomainPart(string url)
         {
