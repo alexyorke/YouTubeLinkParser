@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -144,6 +145,7 @@ namespace YouTubeLinkParser
                 }
             }
 
+            if (username == null) return null;
             if (username.Contains(":") && !username.Contains("http:") && !username.Contains("https:"))
                 return null;
 
@@ -317,6 +319,8 @@ namespace YouTubeLinkParser
         {
             // if the video ID contains a URL-encoded slash (or a regular slash) YouTube will just parse the first part
             videoId = HttpUtility.UrlDecode(videoId);
+
+            if (videoId == null) return null;
 
             videoId = videoId.Split("http://").FirstOrDefault() ?? string.Empty;
             videoId = videoId.Split("https://").FirstOrDefault() ?? string.Empty;

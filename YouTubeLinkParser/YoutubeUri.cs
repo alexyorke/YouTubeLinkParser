@@ -43,9 +43,9 @@ namespace YouTubeLinkParser
         {
             get
             {
-                if (!string.IsNullOrWhiteSpace(ChannelId)) return new Uri($"https://youtube.com/c/{HttpUtility.UrlEncode(ChannelId)}");
+                if (!string.IsNullOrWhiteSpace(ChannelId)) return new Uri($"https://youtube.com/channel/{HttpUtility.UrlEncode(ChannelId)}");
 
-                if (!string.IsNullOrWhiteSpace(VideoId)) return new Uri($"https://youtube.com/v/{VideoId}");
+                if (!string.IsNullOrWhiteSpace(VideoId)) return new Uri($"https://youtube.com/watch?v={VideoId}");
 
                 if (!string.IsNullOrWhiteSpace(PlaylistId))
                     return new Uri($"https://youtube.com/playlist?list={PlaylistId}");
@@ -54,7 +54,7 @@ namespace YouTubeLinkParser
                     return new Uri($"https://youtube.com/results?search_query={HttpUtility.UrlEncode(SearchResults)}");
 
                 return !string.IsNullOrWhiteSpace(UserId) ? new Uri(
-                    $"https://youtube.com/u/{HttpUtility.UrlEncode(UserId)}") : null;
+                    $"https://youtube.com/user/{HttpUtility.UrlEncode(UserId)}") : null;
             }
         }
 
@@ -355,11 +355,22 @@ namespace YouTubeLinkParser
 
         private static bool UriIsValidYouTubeDomain(Uri parsedYouTubeLink)
         {
-            parsedYouTubeLink =
-                new Uri(parsedYouTubeLink.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
-            var domain = Services.GetDomainPart(parsedYouTubeLink.ToString());
+            try
+            {
+                parsedYouTubeLink =
+                    new Uri(parsedYouTubeLink.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
+                        UriFormat.UriEscaped));
 
-            return ValidHosts.Contains(domain);
+                var domain = Services.GetDomainPart(parsedYouTubeLink.ToString());
+
+                return ValidHosts.Contains(domain);
+            }
+            catch (UriFormatException)
+            {
+                // ignored
+            }
+
+            return false;
         }
 
 
