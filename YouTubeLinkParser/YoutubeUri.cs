@@ -230,7 +230,8 @@ namespace YouTubeLinkParser
                     "uk",
                     "uy",
                     "vn",
-                    "voto"
+                    "voto",
+                    "za"
                 };
 
                 validHosts.AddRange(validHosts.ToList().Select(host => $"{host}."));
